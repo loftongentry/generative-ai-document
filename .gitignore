@@ -7,6 +7,8 @@
 
 # testing
 /coverage
+.env
+/service accounts
 
 # next.js
 /.next/
