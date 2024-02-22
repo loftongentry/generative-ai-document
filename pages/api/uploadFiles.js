@@ -1,3 +1,4 @@
+//Need to attach both user id and user email to metadata
 import { Storage } from '@google-cloud/storage'
 import formidable from 'formidable'
 import { createReadStream } from "fs"
@@ -81,14 +82,4 @@ export default async function handler(req, res) {
   } else {
     return res.status(405).json({ error: 'Method not allowed' })
   }
-}
-
-const encryptFile = (fileName, salt) => {
-  const encryptedFile = fileName + salt
-
-  const cipher = crypto.createCipheriv('aes-256-cbc', process.env.ENCRYPTION_KEY, process.env.INITIALIZATION_VECTOR)
-  let encrypted = cipher.update(encryptedFile, 'utf8', 'hex')
-  encrypted += cipher.final('hex')
-
-  return encrypted
 }
