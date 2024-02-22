@@ -35,13 +35,8 @@ export default async function handler(req, res) {
         const selectedFile = files.file[0]
 
         const salt = crypto.randomBytes(16).toString('hex')
-        const initVector = crypto.randomBytes(16)
 
-        const encryptedName = selectedFile.originalFilename + salt
-
-        const cipher = crypto.createCipheriv('aes-256-cbc', process.env.ENCRYPTION_KEY, initVector)
-        let encrypted = cipher.update(encryptedName, 'utf8', 'hex')
-        encrypted += cipher.final('hex')
+        const hashedFilename = crypto.createHash('sha256').update(selectedFile.originalFilename + salt).digest('hex')
         
         const storage = new Storage({
           projectId: process.env.PROJECT_ID,
@@ -52,7 +47,7 @@ export default async function handler(req, res) {
         })
 
         const bucket = storage.bucket(process.env.CLOUD_STORAGE_BUCKET_NAME)
-        const blob = bucket.file(encryptedName)
+        const blob = bucket.file(hashedFilename)
 
         const blobStream = createReadStream(selectedFile.filepath)
           .pipe(blob.createWriteStream({
@@ -70,13 +65,12 @@ export default async function handler(req, res) {
             metadata: {
               userId: id,
               fileName: selectedFile.originalFilename,
-              encryptFile: encryptedName,
+              hashedFileName: hashedFilename,
               salt: salt,
-              initVector: ''
             }
           })
 
-          //const publicURL = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+          const publicURL = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
           return res.status(200).send({ message: `Uploaded the file successfully: ${selectedFile.newFilename}`, url: publicURL, })
         })
       })
