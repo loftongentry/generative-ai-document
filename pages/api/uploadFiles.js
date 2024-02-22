@@ -1,4 +1,5 @@
 //Need to attach both user id and user email to metadata
+//Need to clean this function up so we close the read and write streams
 import { Storage } from '@google-cloud/storage'
 import formidable from 'formidable'
 import { createReadStream } from "fs"
