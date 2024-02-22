@@ -19,9 +19,12 @@ export default function Home() {
         body: formData
       })
 
-      
+      if (!res.ok) {
+        throw new Error(`${res.status} - ${res.statusText}`)
+      }
+
     } catch (error) {
-      console.error(error)
+      console.error(`Error uploading document to server: ${err}`)
     }
   }
 
@@ -31,7 +34,7 @@ export default function Home() {
       <input
         type="file"
         id="fileUpload"
-        accept=".jpg,.jpeg,.png,.doc,.docx,"
+        accept=".jpg,.jpeg,.png,.pdf"
         style={{ display: "none" }}
         onChange={handleFileUpload}
       />
