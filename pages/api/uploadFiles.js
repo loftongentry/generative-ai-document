@@ -1,7 +1,9 @@
-//TODO: Have to change the name or it won't be saved properly into the database
 import { Storage } from '@google-cloud/storage'
 import formidable from 'formidable'
 import { createReadStream } from "fs"
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../api/auth/[...nextauth]'
+const crypto = require('crypto')
 require('dotenv').config({ path: '../../.env' })
 
 export const config = {
@@ -11,6 +13,12 @@ export const config = {
 }
 
 export default async function handler(req, res) {
+  const session = await getServerSession(req, res, authOptions)
+
+  if (!session) {
+    return res.status(401).json({ error: 'User must be logged in to perform this action' })
+  }
+
   if (req.method === 'POST') {
     try {
       const key = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS.toString())
@@ -18,12 +26,23 @@ export default async function handler(req, res) {
       form.keepExtensions = true
 
       form.parse(req, async (error, fields, files) => {
-        if(error){
+        if (error) {
           console.error(error)
           return res.status(400).send({ error: 'Error parsing through file' })
         }
-        
 
+        const id = session?.user?.id
+        const selectedFile = files.file[0]
+
+        const salt = crypto.randomBytes(16).toString('hex')
+        const initVector = crypto.randomBytes(16)
+
+        const encryptedName = selectedFile.originalFilename + salt
+
+        const cipher = crypto.createCipheriv('aes-256-cbc', process.env.ENCRYPTION_KEY, initVector)
+        let encrypted = cipher.update(encryptedName, 'utf8', 'hex')
+        encrypted += cipher.final('hex')
+        
         const storage = new Storage({
           projectId: process.env.PROJECT_ID,
           credentials: {
@@ -33,10 +52,7 @@ export default async function handler(req, res) {
         })
 
         const bucket = storage.bucket(process.env.CLOUD_STORAGE_BUCKET_NAME)
-
-        const selectedFile = files.file[0]
-
-        const blob = bucket.file(selectedFile.originalFilename)
+        const blob = bucket.file(encryptedName)
 
         const blobStream = createReadStream(selectedFile.filepath)
           .pipe(blob.createWriteStream({
@@ -50,14 +66,17 @@ export default async function handler(req, res) {
         })
 
         blobStream.on('finish', async () => {
-          const publicURL = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+          await blob.setMetadata({
+            metadata: {
+              userId: id,
+              fileName: selectedFile.originalFilename,
+              encryptFile: encryptedName,
+              salt: salt,
+              initVector: ''
+            }
+          })
 
-          try {
-            await blob.makePublic()
-          } catch (error) {
-            return res.status(500).send({ message: `Uploaded the file successfully: ${selectedFile.newFilename}, but public access is denied!`, url: publicURL })
-          }
-
+          //const publicURL = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
           return res.status(200).send({ message: `Uploaded the file successfully: ${selectedFile.newFilename}`, url: publicURL, })
         })
       })
@@ -68,4 +87,14 @@ export default async function handler(req, res) {
   } else {
     return res.status(405).json({ error: 'Method not allowed' })
   }
+}
+
+const encryptFile = (fileName, salt) => {
+  const encryptedFile = fileName + salt
+
+  const cipher = crypto.createCipheriv('aes-256-cbc', process.env.ENCRYPTION_KEY, process.env.INITIALIZATION_VECTOR)
+  let encrypted = cipher.update(encryptedFile, 'utf8', 'hex')
+  encrypted += cipher.final('hex')
+
+  return encrypted
 }
