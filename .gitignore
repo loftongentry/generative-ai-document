@@ -9,6 +9,7 @@
 /coverage
 .env
 /service accounts
+/certificates
 
 # next.js
 /.next/
