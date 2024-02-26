@@ -1,3 +1,4 @@
+//TODO: need to remove uuid from local storage if logging out
 import { useEffect, useState } from "react";
 import DefaultAppBar from "@/components/DefaultAppBar";
 import { Box, Button } from "@mui/material";
