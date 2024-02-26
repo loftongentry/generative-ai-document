@@ -37,6 +37,34 @@ const sequelize = new Sequelize(db_name, db_username, db_user_password, {
   }
 })
 
+const closeConnection = async () => {
+  try {
+    await sequelize.close()
+    console.log('Sequelize connection closed succesfully')
+  } catch (error) {
+    console.error(`Error closing sequelize connection: ${error}`)
+  }
+}
+
+process.on('SIGINT', async () => {
+  console.log('Received SIGINT signal. Closing Sequelize connection...')
+  await closeConnection()
+  process.exit(0)
+})
+
+process.on('SIGTERM', async () => {
+  console.log('Received SIGINT signal. Closing Sequelize connection...')
+  await closeConnection()
+  process.exit(0)
+})
+
+process.on('uncaughtException', async (error) => {
+  console.error(`Uncaught error: ${error}`)
+  console.log('Closeing Sequelize connection...')
+  await closeConnection()
+  process.exit(1)
+})
+
 module.exports = sequelize
 
 // Leaving this here as a reminder on how to test the connection
