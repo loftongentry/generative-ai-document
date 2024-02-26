@@ -30,7 +30,7 @@ const sequelize = new Sequelize(db_name, db_username, db_user_password, {
   },
   pool: {
     min: 1,
-    max: 20,
+    max: 15,
     acquire: 60000,
     evict: 20000,
     idle: 15000
