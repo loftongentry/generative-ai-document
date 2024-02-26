@@ -5,6 +5,7 @@ import formidable from 'formidable'
 import { createReadStream } from "fs"
 import { getServerSession } from 'next-auth'
 import authOptions from '../auth/[...nextauth]'
+import getDate from '@/lib/getDate'
 const crypto = require('crypto')
 require('dotenv').config({ path: '../../.env' })
 
@@ -61,15 +62,17 @@ export default async function handler(req, res) {
           return res.status(500).send({ error: 'Error uploading files to cloud storage' })
         })
 
-        //Not receiving the url returned from here. Will most likely have to move it elsewhere
+        //Not receiving the url returned from here even on succesful storage
         blobStream.on('finish', async () => {
           try {
             await blob.setMetadata({
               metadata: {
-                userId: uuid,
-                fileName: selectedFile.originalFilename,
-                hashedFileName: hashedFilename,
-                salt: salt,
+                UUID: uuid,
+                FILE_NAME: selectedFile.originalFilename,
+                FILE_TYPE: selectedFile.mimetype,
+                CREATION_DATE: getDate(),
+                HASHED_FILE_NAME: hashedFilename,
+                SALT: salt,
               }
             })
 
