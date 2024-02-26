@@ -5,7 +5,6 @@ const db_address = process.env.DB_ADDRESS
 const db_dialect = process.env.DB_DIALECT
 const db_name = process.env.DB_NAME
 const db_username = process.env.DB_USERNAME
-const db_password = process.env.DB_PASSWORD
 const db_user_password = process.env.DB_USER_PASSWORD
 const client_cert = process.env.CLIENT_CERT.replace(/\\n/g, '\n')
 const client_key = process.env.CLIENT_KEY.replace(/\\n/g, '\n')
@@ -31,7 +30,7 @@ const sequelize = new Sequelize(db_name, db_username, db_user_password, {
   },
   pool: {
     min: 1,
-    max: 40,
+    max: 20,
     acquire: 60000,
     evict: 20000,
     idle: 15000
