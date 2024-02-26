@@ -68,13 +68,18 @@ const User = sequelize.define('userbase', {
     field: 'document_ids',
     comment: `ID's for documents that are stored in cloud storage`
   }
+},
+  {
+    freezeTableName: true
+  }
+)
 
-})
+// Leaving this here as a reminder on how to create a new table
+// NOTE: Have to cd in the database folder then run 'node models.js' to create tables from models properly
+// const create = async () => {
+//   await sequelize.sync({ force: true })
+// }
 
-const create = async () => {
-  await sequelize.sync({ force: true })
-}
-
-create()
+// create()
 
 module.exports = { User }
