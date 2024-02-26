@@ -1,4 +1,3 @@
-//TODO: need to remove uuid from local storage if logging out
 import { useEffect, useState } from "react";
 import DefaultAppBar from "@/components/DefaultAppBar";
 import { Box, Button } from "@mui/material";
@@ -13,7 +12,7 @@ export default function Home() {
     if (status === 'authenticated') {
       validateUser()
     }
-  }, [session])
+  }, [status])
 
   const validateUser = async () => {
     try {
@@ -29,7 +28,7 @@ export default function Home() {
       const uuid = response.uuid
 
       localStorage.setItem('uuid', uuid)
-      
+
     } catch (error) {
       console.error(`Error occurred when logging in user: ${error}`)
     }
@@ -41,10 +40,11 @@ export default function Home() {
 
   const handleFileSubmit = async () => {
     try {
+      const uuid = localStorage.getItem('uuid')
       const formData = new FormData()
       formData.append('file', selectedFile)
 
-      const res = await fetch('/api/uploadFiles', {
+      const res = await fetch(`/api/upload/${uuid}`, {
         method: 'POST',
         body: formData
       })
@@ -54,7 +54,7 @@ export default function Home() {
       }
 
     } catch (error) {
-      console.error(`Error uploading document to server: ${err}`)
+      console.error(`Error uploading document to server: ${error}`)
     }
   }
 
