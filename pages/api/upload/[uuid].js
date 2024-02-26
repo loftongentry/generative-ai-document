@@ -61,6 +61,7 @@ export default async function handler(req, res) {
           return res.status(500).send({ error: 'Error uploading files to cloud storage' })
         })
 
+        //Not receiving the url returned from here. Will most likely have to move it elsewhere
         blobStream.on('finish', async () => {
           try {
             await blob.setMetadata({
