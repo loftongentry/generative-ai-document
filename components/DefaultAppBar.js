@@ -22,6 +22,11 @@ export default function DefaultAppBar() {
     setAnchorEl(null)
   }
 
+  const handleSignOut = () => {
+    localStorage.removeItem('uuid')
+    signOut()
+  }
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -47,7 +52,7 @@ export default function DefaultAppBar() {
         keepMounted
       >
         {session ? (
-          <MenuItem onClick={() => signOut()}>Logout</MenuItem>
+          <MenuItem onClick={handleSignOut}>Logout</MenuItem>
         ) : (
           <MenuItem onClick={() => signIn()}>Login</MenuItem>
         )}
