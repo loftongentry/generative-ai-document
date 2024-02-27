@@ -22,8 +22,19 @@ export default function DefaultAppBar() {
     setAnchorEl(null)
   }
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     localStorage.removeItem('uuid')
+
+    try {
+      const res = await fetch('/api/logout', { method: 'POST' })
+
+      if (!res.ok) {
+        throw new Error(`${res.status} - ${res.statusText}`)
+      }
+    } catch (error) {
+      console.error(`Error closing sequelize connection: ${error}`)
+    }
+
     signOut()
   }
 

@@ -41,6 +41,7 @@ const sequelize = new Sequelize(db_name, db_username, db_user_password, {
 
 const getSequelizeInstance = () => {
   if (!sequelizeInstance) {
+    console.log('Connecting to sequelize instance...')
     sequelizeInstance = sequelize
   }
 
@@ -57,7 +58,7 @@ const closeConnection = async () => {
 }
 
 process.on('exit', async () => {
-  console.log ('Received exit signal. Closing Sequelize connection...')
+  console.log('Received exit signal. Closing Sequelize connection...')
   await closeConnection()
   process.exit(0)
 })
@@ -81,7 +82,7 @@ process.on('uncaughtException', async (error) => {
   process.exit(1)
 })
 
-module.exports = { getSequelizeInstance }
+module.exports = { sequelize, getSequelizeInstance }
 
 // Leaving this here as a reminder on how to test the connection
 // NOTE: Have to cd in the database folder then run 'node db_def.js' to test properly
