@@ -56,6 +56,12 @@ const closeConnection = async () => {
   }
 }
 
+process.on('exit', async () => {
+  console.log ('Received exit signal. Closing Sequelize connection...')
+  await closeConnection()
+  process.exit(0)
+})
+
 process.on('SIGINT', async () => {
   console.log('Received SIGINT signal. Closing Sequelize connection...')
   await closeConnection()
