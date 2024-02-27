@@ -30,7 +30,7 @@ const sequelize = new Sequelize(db_name, db_username, db_user_password, {
   },
   pool: {
     min: 1,
-    max: 15,
+    max: 20,
     acquire: 60000,
     evict: 20000,
     idle: 15000
@@ -45,6 +45,12 @@ const closeConnection = async () => {
     console.error(`Error closing sequelize connection: ${error}`)
   }
 }
+
+process.on('exit', async () => {
+  console.log ('Received exit signal. Closing Sequelize connection...')
+  await closeConnection()
+  process.exit(0)
+})
 
 process.on('SIGINT', async () => {
   console.log('Received SIGINT signal. Closing Sequelize connection...')
