@@ -1,4 +1,5 @@
 import { User } from "@/database/models";
+import { getDate } from "@/lib/getDate";
 
 export default async function handler(req, res) {
   const { method, query: { email: email } } = req
@@ -13,9 +14,11 @@ export default async function handler(req, res) {
 
       if (!user) {
         user = await User.create({
-          email: email
+          email: email,
         })
       }
+
+      await user.update({ latestLogin: getDate() })
 
       return res.status(200).json({ uuid: user.uuid })
     } catch (error) {
