@@ -10,6 +10,8 @@ const client_cert = process.env.CLIENT_CERT.replace(/\\n/g, '\n')
 const client_key = process.env.CLIENT_KEY.replace(/\\n/g, '\n')
 const server_ca = process.env.SERVER_CA.replace(/\\n/g, '\n')
 
+let sequelizeInstance = null;
+
 const sequelize = new Sequelize(db_name, db_username, db_user_password, {
   host: db_address,
   dialect: db_dialect,
@@ -30,12 +32,20 @@ const sequelize = new Sequelize(db_name, db_username, db_user_password, {
   },
   pool: {
     min: 1,
-    max: 15,
+    max: 5,
     acquire: 60000,
     evict: 20000,
     idle: 15000
   }
 })
+
+const getSequelizeInstance = () => {
+  if (!sequelizeInstance) {
+    sequelizeInstance = sequelize
+  }
+
+  return sequelizeInstance
+}
 
 const closeConnection = async () => {
   try {
@@ -65,7 +75,7 @@ process.on('uncaughtException', async (error) => {
   process.exit(1)
 })
 
-module.exports = sequelize
+module.exports = { getSequelizeInstance }
 
 // Leaving this here as a reminder on how to test the connection
 // NOTE: Have to cd in the database folder then run 'node db_def.js' to test properly

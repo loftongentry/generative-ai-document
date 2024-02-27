@@ -1,5 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize')
-const sequelize = require('./db_def')
+const { getSequelizeInstance } = require('./db_def')
+
+const sequelize = getSequelizeInstance()
 
 const User = sequelize.define('userbase', {
   email: {
