@@ -1,11 +1,10 @@
-//Need to attach both user id to metadata
 //Need to clean this function up so we close the read and write streams
 import { Storage } from '@google-cloud/storage'
 import formidable from 'formidable'
 import { createReadStream } from "fs"
 import { getServerSession } from 'next-auth'
 import authOptions from '../auth/[...nextauth]'
-import getDate from '@/lib/getDate'
+import { getDate } from '@/lib/getDate'
 const crypto = require('crypto')
 require('dotenv').config({ path: '../../.env' })
 
@@ -29,23 +28,18 @@ export default async function handler(req, res) {
       const form = formidable({})
       form.keepExtensions = true
 
-      form.parse(req, async (error, fields, files) => {
-        if (error) {
-          console.error(`Error parsing files: ${error}`)
-          return res.status(400).send({ error: 'Error parsing through files' })
+      const storage = new Storage({
+        projectId: process.env.PROJECT_ID,
+        credentials: {
+          client_email: key.client_email,
+          private_key: key.private_key.replace(/\\n/g, '\n')
         }
+      })
 
+      form.parse(req, async (error, fields, files) => {
         const selectedFile = files.file[0]
         const salt = crypto.randomBytes(16).toString('hex')
         const hashedFilename = crypto.createHash('sha256').update(selectedFile.originalFilename + salt).digest('hex')
-
-        const storage = new Storage({
-          projectId: process.env.PROJECT_ID,
-          credentials: {
-            client_email: key.client_email,
-            private_key: key.private_key.replace(/\\n/g, '\n')
-          }
-        })
 
         const bucket = storage.bucket(process.env.CLOUD_STORAGE_BUCKET_NAME)
         const blob = bucket.file(hashedFilename)
@@ -64,34 +58,29 @@ export default async function handler(req, res) {
 
         //Not receiving the url returned from here even on succesful storage
         blobStream.on('finish', async () => {
-          try {
-            await blob.setMetadata({
-              metadata: {
-                UUID: uuid,
-                FILE_NAME: selectedFile.originalFilename,
-                FILE_TYPE: selectedFile.mimetype,
-                CREATION_DATE: getDate(),
-                HASHED_FILE_NAME: hashedFilename,
-                SALT: salt,
-              }
-            })
+          await blob.setMetadata({
+            metadata: {
+              UUID: uuid,
+              FILE_NAME: selectedFile.originalFilename,
+              FILE_TYPE: selectedFile.mimetype,
+              CREATION_DATE: getDate(),
+              HASHED_FILE_NAME: hashedFilename,
+              SALT: salt,
+            }
+          })
 
-            const publicURL = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-            return res.status(201).send({ message: `Uploaded the file successfully: ${selectedFile.newFilename}`, url: publicURL, })
-          } catch (error) {
-            console.error(`Error setting metadata: ${error}`)
-            return res.status(500).json({ error: 'Error setting metadata' })
-          } finally {
-            blobStream.end()
-          }
+          blobStream.end()
+          fs.unlinkSync(selectedFile.filepath)
         })
       })
 
+      return res.status(201).send({ message: `Uploaded the file successfully: ${selectedFile.newFilename}` })
     } catch (error) {
-      console.error(`Error during file uploads to cloud storage: ${error}`)
-      return res.status(500).json({ error: 'Error during file uploads to cloud storage' })
+      console.error(`Error during file upload to cloud storage: ${error}`)
+      return res.status(500).json({ error: 'Error during file upload to cloud storage' })
     }
   } else {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 }
+

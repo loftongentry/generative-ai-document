@@ -55,7 +55,7 @@ export default function Home() {
       }
 
     } catch (error) {
-      console.error(`Error uploading document to server: ${error}`)
+      console.error(`Error uploading document to google cloud: ${error}`)
     }
   }
 
