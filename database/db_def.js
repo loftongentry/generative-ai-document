@@ -39,7 +39,7 @@ const initializeSequelize = () => {
           max: 5,
           acquire: 60000,
           evict: 20000,
-          idle: 15000
+          idle: 5000
         }
       })
     }
@@ -54,7 +54,6 @@ const initializeSequelize = () => {
 const closeSequelize = async () => {
   try {
     if (sequelizeInstance) {
-      console.log('Closing sequelize connection...')
       await sequelizeInstance.close()
       console.log('Sequelize connection closed succesfully')
       sequelizeInstance = null
@@ -64,23 +63,15 @@ const closeSequelize = async () => {
   }
 }
 
-process.on('exit', async () => {
-  console.log('Received exit signal. Closing Sequelize connection...')
+const gracefulShutdown = async (signal) => {
+  console.log(`Received ${signal}. Closing sequelize connection...`)
   await closeSequelize()
   process.exit(0)
-})
+}
 
-process.on('SIGINT', async () => {
-  console.log('Received SIGINT signal. Closing Sequelize connection...')
-  await closeSequelize()
-  process.exit(0)
-})
-
-process.on('SIGTERM', async () => {
-  console.log('Received SIGTERM signal. Closing Sequelize connection...')
-  await closeSequelize()
-  process.exit(0)
-})
+process.on('exit', () => gracefulShutdown('exit'))
+process.on('SIGINT', () => gracefulShutdown('SIGINT'))
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
 
 process.on('uncaughtException', async (error) => {
   console.error(`Uncaught error: ${error}`)
