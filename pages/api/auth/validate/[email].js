@@ -1,3 +1,4 @@
+import { initializeSequelize } from "@/database/db_def";
 import { User } from "@/database/models";
 import { getDate } from "@/lib/getDate";
 
@@ -6,6 +7,8 @@ export default async function handler(req, res) {
 
   if (method === 'GET') {
     try {
+      initializeSequelize()
+      
       let user = await User.findOne({
         where: {
           email: email

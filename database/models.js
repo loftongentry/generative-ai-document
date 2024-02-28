@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize')
-const { getSequelizeInstance } = require('./db_def')
+const { initializeSequelize } = require('./db_def')
 
-const sequelize = getSequelizeInstance()
+const sequelize = initializeSequelize()
 
 const User = sequelize.define('userbase', {
   email: {
@@ -81,7 +81,5 @@ const User = sequelize.define('userbase', {
 // const create = async () => {
 //   await sequelize.sync({ force: true })
 // }
-
-// create()
 
 module.exports = { User }

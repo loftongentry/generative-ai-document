@@ -1,12 +1,11 @@
-import { sequelize } from "@/database/db_def"
+import { closeSequelize } from "@/database/db_def"
 
 export default async function handler(req, res) {
   const { method } = req
   if (method === 'POST') {
     try {
-      await sequelize.close()
+      await closeSequelize()
 
-      console.log('Disconnecting from sequelize instance...')
       return res.status(200).json({ success: true })
     } catch (error) {
       console.error(`Error closing sequelize connection: ${error}`)
