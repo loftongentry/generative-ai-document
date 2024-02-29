@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import DefaultAppBar from "@/components/DefaultAppBar";
 import { Box, Button } from "@mui/material";
 import { useSession } from "next-auth/react";
+import Dropzone from "@/components/Dropzone";
 
 export default function Home() {
   const { data: session, status } = useSession()
   const email = session?.user?.email
-  const [selectedFile, setSelectedFile] = useState(null)
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -34,49 +34,10 @@ export default function Home() {
     }
   }
 
-  const handleFileUpload = (event) => {
-    setSelectedFile(event.target.files[0])
-  }
-
-  //TODO: Not receiving a response from api call
-  const handleFileSubmit = async () => {
-    try {
-      const uuid = localStorage.getItem('uuid')
-      const formData = new FormData()
-      formData.append('file', selectedFile)
-
-      const res = await fetch(`/api/upload/${uuid}`, {
-        method: 'POST',
-        body: formData
-      })
-
-      if (!res.ok) {
-        throw new Error(`${res.status} - ${res.statusText}`)
-      }
-
-    } catch (error) {
-      console.error(`Error uploading document to google cloud: ${error}`)
-    }
-  }
-
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <DefaultAppBar />
-      <input
-        type="file"
-        id="fileUpload"
-        accept=".jpg,.jpeg,.png,.pdf"
-        style={{ display: "none" }}
-        onChange={handleFileUpload}
-      />
-      <label htmlFor="fileUpload">
-        <Button variant="contained" component="span">
-          Upload File
-        </Button>
-      </label>
-      <Button variant="contained" onClick={handleFileSubmit}>
-        Submit
-      </Button>
+      <Dropzone />
     </Box>
   )
 }
