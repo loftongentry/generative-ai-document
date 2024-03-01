@@ -1,11 +1,13 @@
-import { Box, Button, List, ListItem, Typography } from "@mui/material"
+import { Box, Button, FormControl, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
 import Image from "next/image"
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
+import BackupIcon from '@mui/icons-material/Backup';
+import DescriptionIcon from '@mui/icons-material/Description';
+import { DeleteForever } from "@mui/icons-material";
 
 const Dropzone = (props) => {
-  const { } = props
-  const [files, setFiles] = useState([])
+  const { files, setFiles } = props
 
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles?.length) {
@@ -18,7 +20,22 @@ const Dropzone = (props) => {
     }
   }, [])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    validator: (newFile) => {
+      const exists = files.some(file => file.name === newFile.name)
+
+      if (!exists) {
+        return false
+      }
+
+      return true
+    }
+  })
+
+  const removeFile = (name) => {
+    setFiles(files => files.filter(file => file.name !== name))
+  }
 
   //TODO: Not receiving a response from api call
   const handleFileSubmit = async () => {
@@ -42,38 +59,91 @@ const Dropzone = (props) => {
   }
 
   return (
-    <Box>
-      <Box {...getRootProps({})}>
-        <input {...getInputProps()} />
-        {isDragActive ? (
-          <Typography>Drop the files here...</Typography>
-        ) : (
-          <Typography>Drag and drop some files here, or click to select files</Typography>
-        )}
-      </Box>
-      <ul style={{ display: 'flex', listStyleType: 'none', padding: 0 }}>
-        {files.map(file => (
-          <li key={file.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px' }}>
-            <Image
-              src={file.preview}
-              alt={file.name}
-              width={300}
-              height={300}
-              onLoad={() => {
-                URL.revokeObjectURL(file.preview)
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <IconButton
+        {...getRootProps({})}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          border: '2px #A9A9A9 dashed',
+          borderRadius: '5px',
+          padding: '20px'
+        }}
+      >
+        <input
+          {...getInputProps()}
+        />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '10px'
+          }}
+        >
+          <BackupIcon sx={{ fontSize: 100 }} />
+          {isDragActive ? (
+            <Typography>
+              Drop the files here...
+            </Typography>
+          ) : (
+            <Typography>
+              Drag and drop some files here, or click to select files
+            </Typography>
+          )}
+        </Box>
+      </IconButton>
+
+      <List>
+        {files.map((file, index) => (
+          <ListItemButton
+            key={file.name}
+            sx={{
+              border: '2px #A9A9A9 dashed',
+              borderRadius: '5px',
+              marginBottom: index !== files.length - 1 ? '8px' : 0
+            }}
+          >
+            <Tooltip
+              TransitionComponent={Zoom}
+              title={
+                <Image
+                  src={file.preview}
+                  alt={file.name}
+                  width={0}
+                  height={0}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '5px'
+                  }}
+                />
+              }
+              followCursor
+              componentProps={{
+                tooltip: {
+                  maxWidth: '100%',
+                  padding: '10px',
+                  borderRadius: '5px'
+                }
               }}
-              style={{ maxWidth: '70%', maxHeight: '70%', width: 'auto', height: 'auto', border: '2px gray solid', borderRadius: '10px' }}
-            />
-            <Typography>{file.name}</Typography>
-            <Button
-              sx={{ position: 'relative', top: '5px', right: '5px' }}
-              onClick={() => removeFile(index)}
             >
-              X
-            </Button>
-          </li>
+              <ListItem key={file.name}>
+                <ListItemAvatar>
+                  <DescriptionIcon />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={file.name}
+                  secondary={file.size}
+                />
+              </ListItem>
+            </Tooltip>
+            <IconButton onClick={() => removeFile(file.name)}>
+              <DeleteForever sx={{ fontSize: 40, color: 'red' }} />
+            </IconButton>
+          </ListItemButton>
         ))}
-      </ul>
+      </List>
     </Box>
   )
 }

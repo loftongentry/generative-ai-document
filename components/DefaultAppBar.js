@@ -38,8 +38,14 @@ export default function DefaultAppBar() {
           onClick={handleMenuOpen}
           edge="end"
         >
-          <Tooltip open={signedIn} title={signedIn ? 'You must be logged in to view data' : ''} placement="left">
-            <Avatar src={session?.user?.image} alt={session?.user?.name} />
+          <Tooltip
+            open={signedIn}
+            title={signedIn ? 'You must be logged in to view data' : ''}
+            placement="left">
+            <Avatar
+              src={session?.user?.image}
+              alt={session?.user?.name}
+            />
           </Tooltip>
         </IconButton>
       </Toolbar>
@@ -52,11 +58,15 @@ export default function DefaultAppBar() {
         keepMounted
       >
         {session ? (
-          <MenuItem onClick={handleSignOut}>Logout</MenuItem>
+          <MenuItem onClick={handleSignOut}>
+            Logout
+          </MenuItem>
         ) : (
-          <MenuItem onClick={() => signIn()}>Login</MenuItem>
+          <MenuItem onClick={() => signIn()}>
+            Login
+          </MenuItem>
         )}
       </Menu>
     </AppBar>
-  );
+  )
 }

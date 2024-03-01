@@ -7,6 +7,7 @@ import Dropzone from "@/components/Dropzone";
 export default function Home() {
   const { data: session, status } = useSession()
   const email = session?.user?.email
+  const [files, setFiles] = useState([])
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -35,9 +36,19 @@ export default function Home() {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '20px'
+      }}
+    >
       <DefaultAppBar />
-      <Dropzone />
+      <Dropzone
+        files={files}
+        setFiles={setFiles}
+      />
     </Box>
   )
 }
