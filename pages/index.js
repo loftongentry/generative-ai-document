@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import DefaultAppBar from "@/components/DefaultAppBar";
-import { Box, Button } from "@mui/material";
 import { useSession } from "next-auth/react";
+import { Box } from "@mui/material";
+import DefaultAppBar from "@/components/DefaultAppBar";
 import Dropzone from "@/components/Dropzone";
 
 export default function Home() {
