@@ -1,3 +1,4 @@
+//TODO: This will eventually become a side bar
 import { useState, useEffect } from "react";
 import { AppBar, Toolbar, IconButton, MenuItem, Menu, Avatar, Typography, Tooltip } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";

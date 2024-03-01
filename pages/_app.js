@@ -1,6 +1,7 @@
+//TODO: Need to adjust global styling so it's not so bright OR, make it so that on button click switches between dark and light mode
 import { SessionProvider } from "next-auth/react"
-import '../styles/globals.css'
 import { ThemeProvider, createTheme } from "@mui/material"
+import '../styles/globals.css'
 
 const theme = createTheme({
   palette: {
