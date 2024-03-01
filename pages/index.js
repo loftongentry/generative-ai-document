@@ -1,3 +1,4 @@
+//TODO: Snackbar messages for success, warning, errors (using useContext)
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Box } from "@mui/material";

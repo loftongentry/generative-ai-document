@@ -1,4 +1,9 @@
-//TODO: Need to handle previewing a PDF file
+//TODO: Handle previewing a PDF file
+//TODO: Prevent drop zone from behaving sporadically when passing document over and dramatically increasing in size after document uploaded
+//TODO: Shows a different icon and message if user tries to hover over and drop a document that will not be accepted (i.e. .doc, .docx, .xlsx, etc.)
+//TODO: For loading symbol, shows spinning loading logo on top of cloud
+//TODO: On receiving succesful response from /api/getFileData, smoothly redirects to results (like a transition slide)
+//TODO: Warning if user is trying to upload more than one document that it will take longer to evaluate
 //TODO: Not receiving a response from api call
 //TODO: Suppress "IconButton" error
 import Image from "next/image"

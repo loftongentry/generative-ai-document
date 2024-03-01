@@ -1,4 +1,4 @@
-//TODO: Need to adjust global styling so it's not so bright OR, make it so that on button click switches between dark and light mode
+//TODO: Need to adjust global styling so it's not so bright AND/OR make it so that on button click switches between dark and light mode
 import { SessionProvider } from "next-auth/react"
 import { ThemeProvider, createTheme } from "@mui/material"
 import '../styles/globals.css'
