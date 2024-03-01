@@ -1,7 +1,10 @@
-import { Box, Button, FormControl, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
+//TODO: Need to handle previewing a PDF file
+//TODO: Not receiving a response from api call
+//TODO: Suppress "IconButton" error
 import Image from "next/image"
 import { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
+import { Box, Button, Fade, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
 import BackupIcon from '@mui/icons-material/Backup';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { DeleteForever } from "@mui/icons-material";
@@ -37,8 +40,7 @@ const Dropzone = (props) => {
     setFiles(files => files.filter(file => file.name !== name))
   }
 
-  //TODO: Not receiving a response from api call
-  const handleFileSubmit = async () => {
+  const handleSubmit = async () => {
     try {
       const uuid = localStorage.getItem('uuid')
       const formData = new FormData()
@@ -144,6 +146,11 @@ const Dropzone = (props) => {
           </ListItemButton>
         ))}
       </List>
+      <Fade in={files.length > 0}>
+        <Button variant='contained' onClick={handleSubmit}>
+          Submit
+        </Button>
+      </Fade>
     </Box>
   )
 }
