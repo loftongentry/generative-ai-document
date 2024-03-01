@@ -42,7 +42,8 @@ export default function DefaultAppBar() {
           <Tooltip
             open={signedIn}
             title={signedIn ? 'You must be logged in to view data' : ''}
-            placement="left">
+            placement="left"
+          >
             <Avatar
               src={session?.user?.image}
               alt={session?.user?.name}
