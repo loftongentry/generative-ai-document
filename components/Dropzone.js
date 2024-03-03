@@ -1,4 +1,4 @@
-//TODO: Handle previewing a PDF file
+//TODO: Proper styling of PDF preview
 //TODO: Prevent drop zone from behaving sporadically when passing document over and dramatically increasing in size after document uploaded
 //TODO: Shows a different icon and message if user tries to hover over and drop a document that will not be accepted (i.e. .doc, .docx, .xlsx, etc.)
 //TODO: For loading symbol, shows spinning loading logo on top of cloud, then once response is received, if succesful, show clod with checkmark, if failed, show something with an x
@@ -6,13 +6,14 @@
 //TODO: Warning if user is trying to upload more than one document that it will take longer to evaluate
 //TODO: Not receiving a response from api call
 //TODO: Suppress "IconButton" error
-import Image from "next/image"
 import { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
+import Image from "next/image"
 import { Box, Button, Fade, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
 import BackupIcon from '@mui/icons-material/Backup';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { DeleteForever } from "@mui/icons-material";
+import { Viewer, Worker, SpecialZoomLevel } from "@react-pdf-viewer/core";
 
 const Dropzone = (props) => {
   const { files, setFiles } = props
@@ -64,9 +65,9 @@ const Dropzone = (props) => {
       console.error(`Error uploading document to google cloud: ${error}`)
     }
   }
-
+  
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '425px' }}>
       <IconButton
         {...getRootProps({})}
         sx={{
@@ -113,7 +114,22 @@ const Dropzone = (props) => {
           >
             <Tooltip
               TransitionComponent={Zoom}
-              title={
+              title={file.type === 'application/pdf' ? (
+                <Worker workerUrl='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js'>
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: '200px'
+                    }}
+                  >
+                    <Viewer
+                      fileUrl={file.preview}
+                      initialPage={2}
+                      defaultScale={SpecialZoomLevel.PageFit}
+                    />
+                  </Box>
+                </Worker>
+              ) : (
                 <Image
                   src={file.preview}
                   alt={file.name}
@@ -125,10 +141,11 @@ const Dropzone = (props) => {
                     borderRadius: '5px'
                   }}
                 />
-              }
+              )}
               followCursor
-              componentProps={{
+              componentprops={{
                 tooltip: {
+                  width: '1000px',
                   maxWidth: '100%',
                   padding: '10px',
                   borderRadius: '5px'
