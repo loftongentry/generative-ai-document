@@ -2,12 +2,13 @@
 //TODO: Settings modal
 //TODO: Feedback modal
 import { useState } from "react";
-import { IconButton, Avatar, Drawer, Box, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList } from '@mui/material';
+import { IconButton, Avatar, Drawer, Box, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
 import FeedbackIcon from '@mui/icons-material/Feedback';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 
 const DefaultAppDrawer = (props) => {
   const { drawerWidth } = props
@@ -43,6 +44,31 @@ const DefaultAppDrawer = (props) => {
         display: 'flex'
       }}
     >
+      <Toolbar
+        sx={{
+          display: 'flex',
+          justifyContent: 'center'
+        }}
+        disableGutters
+      >
+        <IconButton
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            width: '95%',
+            height: '80%',
+            borderRadius: '5px',
+            gap: '5px'
+          }}
+        >
+          <InsertDriveFileIcon />
+          <Typography>
+            New Upload
+          </Typography>
+        </IconButton>
+      </Toolbar>
+      <Divider />
       <Box
         sx={{
           display: 'flex',
