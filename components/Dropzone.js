@@ -65,9 +65,9 @@ const Dropzone = (props) => {
       console.error(`Error uploading document to google cloud: ${error}`)
     }
   }
-  
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '425px' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', width: '100%' }}>
       <IconButton
         {...getRootProps({})}
         sx={{
@@ -75,7 +75,8 @@ const Dropzone = (props) => {
           justifyContent: 'center',
           border: '2px #A9A9A9 dashed',
           borderRadius: '5px',
-          padding: '20px'
+          padding: '20px',
+          width: '425px'
         }}
       >
         <input
