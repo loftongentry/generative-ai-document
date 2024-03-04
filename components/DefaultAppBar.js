@@ -1,7 +1,7 @@
 //TODO: Hide and show Drawer component
 //TODO: Forcing layout properly: New image batch at top, list of preview documents, name and icon at bottom
 import { useState } from "react";
-import { IconButton, Avatar, Drawer, Box, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, ListItem } from '@mui/material';
+import { IconButton, Avatar, Drawer, Box, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
