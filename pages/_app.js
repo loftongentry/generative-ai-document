@@ -1,6 +1,8 @@
 //TODO: Need to adjust global styling so it's not so bright AND/OR make it so that on button click switches between dark and light mode
 import { SessionProvider } from "next-auth/react"
 import { ThemeProvider, createTheme } from "@mui/material"
+import { SnackbarProvider } from "@/context/SnackbarContext"
+import '../styles/globals.css'
 import '../styles/globals.css'
 
 const theme = createTheme({
@@ -16,10 +18,12 @@ const theme = createTheme({
 
 export default function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
-    <SessionProvider session={session}>
-      <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </SessionProvider>
+    <SnackbarProvider>
+      <SessionProvider session={session}>
+        <ThemeProvider theme={theme}>
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </SessionProvider>
+    </SnackbarProvider>
   )
 }

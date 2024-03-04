@@ -1,14 +1,16 @@
-//TODO: Snackbar messages for success, warning, errors (using useContext)
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Box, IconButton } from "@mui/material";
+import { useSnackbar } from "@/context/SnackbarContext";
 import DefaultAppDrawer from "@/components/DefaultAppDrawer";
 import Dropzone from "@/components/Dropzone";
+import CustomSnackbar from "@/components/CustomSnackbar";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function Home() {
   const { data: session, status } = useSession()
+  const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
   const email = session?.user?.email
   const [files, setFiles] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(true)
@@ -37,6 +39,7 @@ export default function Home() {
 
     } catch (error) {
       console.error(`Error occurred when logging in user: ${error}`)
+      openSnackbar({ message: 'Error signing in user', severity: 'error' })
     }
   }
 
@@ -68,6 +71,14 @@ export default function Home() {
         setFiles={setFiles}
         drawerOpen={drawerOpen}
         drawerWidth={drawerWidth}
+        openSnackbar={openSnackbar}
+      />
+
+      <CustomSnackbar
+        open={open}
+        onClose={closeSnackbar}
+        message={message}
+        severity={severity}
       />
     </Box >
   )
