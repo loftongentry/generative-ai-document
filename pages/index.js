@@ -40,9 +40,9 @@ export default function Home() {
     <Box
       sx={{
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '20px'
+        flexDirection: 'row',
+        width: '100vw',
+        height: '100vh'
       }}
     >
       <DefaultAppBar />
