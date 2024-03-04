@@ -9,13 +9,14 @@
 import { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
-import { Box, Button, Fade, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
+import { Box, Button, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
 import BackupIcon from '@mui/icons-material/Backup';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { DeleteForever } from "@mui/icons-material";
 import { Viewer, Worker, SpecialZoomLevel } from "@react-pdf-viewer/core";
 
 const Dropzone = (props) => {
+  const { drawerOpen, drawerWidth } = props
   const { files, setFiles } = props
 
   const onDrop = useCallback(acceptedFiles => {
@@ -67,7 +68,15 @@ const Dropzone = (props) => {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', width: '100%' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: drawerOpen ? `calc(100vw - ${drawerWidth}px)` : '100vw',
+      }}
+    >
       <IconButton
         {...getRootProps({})}
         sx={{
@@ -155,7 +164,7 @@ const Dropzone = (props) => {
             >
               <ListItem key={file.name}>
                 <ListItemIcon >
-                  <DescriptionIcon sx={{ fontSize: 40}}/>
+                  <DescriptionIcon sx={{ fontSize: 40 }} />
                 </ListItemIcon>
                 <ListItemText
                   primary={file.name}

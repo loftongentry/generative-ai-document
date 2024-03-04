@@ -1,13 +1,16 @@
-//TODO: Hide and show Drawer component
 //TODO: Forcing layout properly: New image batch at top, list of preview documents, name and icon at bottom
+//TODO: Settings modal
+//TODO: Feedback modal
 import { useState } from "react";
 import { IconButton, Avatar, Drawer, Box, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
+import FeedbackIcon from '@mui/icons-material/Feedback';
 
-export default function DefaultAppBar() {
+const DefaultAppDrawer = (props) => {
+  const { drawerWidth } = props
   const { data: session } = useSession()
   const [anchorEl, setAnchorEl] = useState(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -27,11 +30,10 @@ export default function DefaultAppBar() {
     signOut()
   }
 
-  const drawerWidth = 240
-
   return (
     <Drawer
-      variant='permanent'
+      open={true}
+      variant='persistent'
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -85,6 +87,12 @@ export default function DefaultAppBar() {
               </ListItemIcon>
               <ListItemText>Settings</ListItemText>
             </MenuItem>
+            <MenuItem>
+              <ListItemIcon>
+                <FeedbackIcon />
+              </ListItemIcon>
+              <ListItemText>Feedback</ListItemText>
+            </MenuItem>
             <Divider />
             <MenuItem onClick={handleSignOut} >
               <ListItemIcon>
@@ -107,3 +115,5 @@ export default function DefaultAppBar() {
     </Drawer>
   )
 }
+
+export default DefaultAppDrawer

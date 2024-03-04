@@ -1,14 +1,18 @@
 //TODO: Snackbar messages for success, warning, errors (using useContext)
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Box } from "@mui/material";
-import DefaultAppBar from "@/components/DefaultAppBar";
+import { Box, IconButton } from "@mui/material";
+import DefaultAppDrawer from "@/components/DefaultAppDrawer";
 import Dropzone from "@/components/Dropzone";
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function Home() {
   const { data: session, status } = useSession()
   const email = session?.user?.email
   const [files, setFiles] = useState([])
+  const [drawerOpen, setDrawerOpen] = useState(true)
+  const drawerWidth = drawerOpen ? 240 : 0
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -45,10 +49,30 @@ export default function Home() {
         height: '100vh'
       }}
     >
-      <DefaultAppBar />
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      >
+        <DefaultAppDrawer
+          drawerWidth={drawerWidth}
+        />
+        {drawerOpen ? (
+          <IconButton onClick={() => setDrawerOpen(false)}>
+            <ArrowBackIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={() => setDrawerOpen(true)}>
+            <ArrowForwardIcon />
+          </IconButton>
+        )}
+      </Box>
       <Dropzone
         files={files}
         setFiles={setFiles}
+        drawerOpen={drawerOpen}
+        drawerWidth={drawerWidth}
       />
     </Box>
   )
