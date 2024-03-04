@@ -9,7 +9,7 @@
 import { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
-import { Box, Button, Fade, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
+import { Box, Button, Fade, IconButton, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
 import BackupIcon from '@mui/icons-material/Backup';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { DeleteForever } from "@mui/icons-material";
@@ -154,9 +154,9 @@ const Dropzone = (props) => {
               }}
             >
               <ListItem key={file.name}>
-                <ListItemAvatar>
-                  <DescriptionIcon />
-                </ListItemAvatar>
+                <ListItemIcon >
+                  <DescriptionIcon sx={{ fontSize: 40}}/>
+                </ListItemIcon>
                 <ListItemText
                   primary={file.name}
                   secondary={file.size}
