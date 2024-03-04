@@ -52,28 +52,23 @@ export default function Home() {
       <Box
         sx={{
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <DefaultAppDrawer
           drawerWidth={drawerWidth}
         />
-        {drawerOpen ? (
-          <IconButton onClick={() => setDrawerOpen(false)}>
-            <ArrowBackIcon />
-          </IconButton>
-        ) : (
-          <IconButton onClick={() => setDrawerOpen(true)}>
-            <ArrowForwardIcon />
-          </IconButton>
-        )}
+        <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
+          {drawerOpen ? <ArrowBackIcon /> : <ArrowForwardIcon />}
+        </IconButton>
       </Box>
+
       <Dropzone
         files={files}
         setFiles={setFiles}
         drawerOpen={drawerOpen}
         drawerWidth={drawerWidth}
       />
-    </Box>
+    </Box >
   )
 }
