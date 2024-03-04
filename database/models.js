@@ -1,7 +1,5 @@
-const { DataTypes } = require('sequelize')
-const { initializeSequelize } = require('./db_def')
-
-const sequelize = initializeSequelize()
+const { Sequelize, DataTypes } = require('sequelize')
+const { sequelize } = require('./db_def')
 
 const User = sequelize.define('userbase', {
   email: {
