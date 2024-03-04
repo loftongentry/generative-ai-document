@@ -5,7 +5,6 @@
 //TODO: On receiving succesful response from /api/getFileData, smoothly redirects to results (like a transition slide)
 //TODO: Warning if user is trying to upload more than one document that it will take longer to evaluate
 //TODO: Not receiving a response from api call
-//TODO: Suppress "IconButton" error
 import { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
@@ -16,7 +15,7 @@ import { DeleteForever } from "@mui/icons-material";
 import { Viewer, Worker, SpecialZoomLevel } from "@react-pdf-viewer/core";
 
 const Dropzone = (props) => {
-  const { drawerOpen, drawerWidth } = props
+  const { drawerOpen, drawerWidth, openSnackbar } = props
   const { files, setFiles } = props
 
   const onDrop = useCallback(acceptedFiles => {
@@ -30,7 +29,7 @@ const Dropzone = (props) => {
     }
   }, [])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, isDragActive } = useDropzone({
     onDrop,
     validator: (newFile) => {
       const exists = files.some(file => file.name === newFile.name)
@@ -39,6 +38,7 @@ const Dropzone = (props) => {
         return false
       }
 
+      openSnackbar({ message: 'Cannot upload the same file twice', severity: 'error' })
       return true
     }
   })
@@ -88,9 +88,6 @@ const Dropzone = (props) => {
           width: '425px'
         }}
       >
-        <input
-          {...getInputProps()}
-        />
         <Box
           sx={{
             display: 'flex',
@@ -100,21 +97,15 @@ const Dropzone = (props) => {
           }}
         >
           <BackupIcon sx={{ fontSize: 100 }} />
-          {isDragActive ? (
-            <Typography>
-              Drop the files here...
-            </Typography>
-          ) : (
-            <Typography>
-              Drag and drop some files here, or click to select files
-            </Typography>
-          )}
+          <Typography>
+            {isDragActive ? 'Drop the files here...' : 'Drag and drop some files here, or click to select files'}
+          </Typography>
         </Box>
       </IconButton>
 
       <List>
         {files.map((file, index) => (
-          <ListItemButton
+          <ListItem
             key={file.name}
             sx={{
               border: '2px #A9A9A9 dashed',
@@ -162,7 +153,12 @@ const Dropzone = (props) => {
                 }
               }}
             >
-              <ListItem key={file.name}>
+              <ListItemButton
+                key={file.name}
+                sx={{
+                  borderRadius: '5px'
+                }}
+              >
                 <ListItemIcon >
                   <DescriptionIcon sx={{ fontSize: 40 }} />
                 </ListItemIcon>
@@ -170,12 +166,12 @@ const Dropzone = (props) => {
                   primary={file.name}
                   secondary={file.size}
                 />
-              </ListItem>
+              </ListItemButton>
             </Tooltip>
             <IconButton onClick={() => removeFile(file.name)}>
               <DeleteForever sx={{ fontSize: 40, color: 'red' }} />
             </IconButton>
-          </ListItemButton>
+          </ListItem>
         ))}
       </List>
       <Fade in={files.length > 0}>
