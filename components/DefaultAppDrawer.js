@@ -1,11 +1,10 @@
-//TODO: Forcing layout properly: New image batch at top, list of preview documents, name and icon at bottom
 //TODO: Settings modal
 //TODO: Feedback modal
 //TODO: Change name
 //TODO: Delete file
-//TODO: Make it so that the list of files doesn't avatar at the bottom
+//TODO: Smooth transition of hiding and showing Drawer
 import { useState } from "react";
-import { IconButton, Avatar, Drawer, Box, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List } from '@mui/material';
+import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -65,7 +64,6 @@ const DefaultAppDrawer = (props) => {
     >
       <Toolbar
         sx={{
-          display: 'flex',
           justifyContent: 'center',
         }}
         disableGutters
@@ -88,37 +86,35 @@ const DefaultAppDrawer = (props) => {
         </IconButton>
       </Toolbar>
       <Divider />
-      <Box
+      <List
         sx={{
-          overflow: 'auto',
+          overflowY: 'auto',
         }}
       >
-        <List>
-          {TestItems.map((item, index) => (
-            <ListItem
-              key={item.name}
-              sz={{
-                marginBottom: index !== TestItems.length - 1 ? '8px' : 0
+        {TestItems.map((item, index) => (
+          <ListItem
+            key={item.name}
+            sz={{
+              marginBottom: index !== TestItems.length - 1 ? '8px' : 0
+            }}
+            secondaryAction={
+              <IconButton onClick={handleListItemMenuOpen}>
+                <MoreVertIcon />
+              </IconButton>
+            }
+          >
+            <ListItemButton
+              sx={{
+                borderRadius: '5px'
               }}
-              secondaryAction={
-                <IconButton onClick={handleListItemMenuOpen}>
-                  <MoreVertIcon />
-                </IconButton>
-              }
             >
-              <ListItemButton
-                sx={{
-                  borderRadius: '5px'
-                }}
-              >
-                <ListItemText
-                  primary={item.name}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Box>
+              <ListItemText
+                primary={item.name}
+              />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
       <Popover
         open={listItemMenuOpen}
         anchorEl={listItemAnchorEl}
@@ -148,18 +144,8 @@ const DefaultAppDrawer = (props) => {
         </MenuList>
       </Popover>
       <Divider />
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          margin: '5px',
-          position: 'absolute',
-          bottom: 0
-        }}
-      >
-        <IconButton
-          onClick={handleProfileMenuOpen}
-        >
+      <Toolbar disableGutters>
+        <IconButton onClick={handleProfileMenuOpen}>
           <Avatar
             src={session?.user?.image}
             alt={session?.user?.name}
@@ -168,7 +154,7 @@ const DefaultAppDrawer = (props) => {
         <Typography>
           {session?.user?.name}
         </Typography>
-      </Box>
+      </Toolbar>
       <Popover
         open={profileMenuOpen}
         anchorEl={profileAnchorEl}
