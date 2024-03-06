@@ -14,7 +14,6 @@
     "@google-cloud/storage": "^7.7.0",
     "@mui/icons-material": "^5.15.11",
     "@mui/material": "^5.15.10",
-    "@react-pdf-viewer/core": "^3.12.0",
     "dotenv": "^16.4.3",
     "formidable": "^3.5.1",
     "googleapis": "^133.0.0",
@@ -26,6 +25,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
+    "react-pdf": "^7.7.1",
     "sequelize": "^6.37.1"
   }
 }

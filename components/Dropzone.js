@@ -8,11 +8,15 @@
 import { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
-import { Box, Button, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
+import { Box, Button, CircularProgress, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
 import BackupIcon from '@mui/icons-material/Backup';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { DeleteForever } from "@mui/icons-material";
-import { Viewer, Worker, SpecialZoomLevel } from "@react-pdf-viewer/core";
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 const Dropzone = (props) => {
   const { drawerOpen, drawerWidth, openSnackbar } = props
@@ -116,20 +120,26 @@ const Dropzone = (props) => {
             <Tooltip
               TransitionComponent={Zoom}
               title={file.type === 'application/pdf' ? (
-                <Worker workerUrl='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js'>
-                  <Box
-                    sx={{
-                      width: '100%',
-                      height: '200px'
-                    }}
-                  >
-                    <Viewer
-                      fileUrl={file.preview}
-                      initialPage={2}
-                      defaultScale={SpecialZoomLevel.PageFit}
-                    />
-                  </Box>
-                </Worker>
+                <Document
+                  file={file.preview}
+                  loading={
+                    <Box 
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <CircularProgress />
+                    </Box>
+                  }
+                  error={'Failed to load PDF preview'}
+                >
+                  <Page 
+                    pageNumber={1}
+                    height={300}
+                  />
+                </Document>
               ) : (
                 <Image
                   src={file.preview}
@@ -146,7 +156,6 @@ const Dropzone = (props) => {
               followCursor
               componentprops={{
                 tooltip: {
-                  width: '1000px',
                   maxWidth: '100%',
                   padding: '10px',
                   borderRadius: '5px'
