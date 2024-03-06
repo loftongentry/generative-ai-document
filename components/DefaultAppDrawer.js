@@ -3,8 +3,9 @@
 //TODO: Change name
 //TODO: Delete file
 //TODO: Smooth transition of hiding and showing Drawer
+//TODO: Change styling of scrollbar
 import { useState } from "react";
-import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List } from '@mui/material';
+import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -19,10 +20,12 @@ import { TestItems } from "@/test/TestItems";
 const DefaultAppDrawer = (props) => {
   const { drawerWidth } = props
   const { data: session } = useSession()
+  const [listItems, setListItems] = useState(TestItems)
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [listItemAnchorEl, setListItemAnchorEl] = useState(null)
   const [listItemMenuOpen, setListItemMenuOpen] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
 
   const handleProfileMenuOpen = (event) => {
     setProfileMenuOpen(true)
@@ -34,9 +37,10 @@ const DefaultAppDrawer = (props) => {
     profileProfileAnchorEl(null)
   }
 
-  const handleListItemMenuOpen = (event) => {
+  const handleListItemMenuOpen = (event, item) => {
     setListItemMenuOpen(true)
     setListItemAnchorEl(event.currentTarget)
+    setSelectedItem(item)
   }
 
   const handleListItemMenuClose = () => {
@@ -49,6 +53,15 @@ const DefaultAppDrawer = (props) => {
     signOut()
   }
 
+  const handleListItem = (action) => {
+    if (action === 'Delete') {
+      const updatedList = listItems.filter(item => item.name !== selectedItem.name)
+      setListItems(updatedList)
+    }
+
+    handleListItemMenuClose()
+  }
+
   return (
     <Drawer
       open={true}
@@ -59,7 +72,6 @@ const DefaultAppDrawer = (props) => {
         '& .MuiDrawer-paper': {
           width: drawerWidth,
         },
-        display: 'flex',
       }}
     >
       <Toolbar
@@ -86,121 +98,132 @@ const DefaultAppDrawer = (props) => {
         </IconButton>
       </Toolbar>
       <Divider />
-      <List
+      <Box
         sx={{
           overflowY: 'auto',
         }}
       >
-        {TestItems.map((item, index) => (
-          <ListItem
-            key={item.name}
-            sz={{
-              marginBottom: index !== TestItems.length - 1 ? '8px' : 0
-            }}
-            secondaryAction={
-              <IconButton onClick={handleListItemMenuOpen}>
-                <MoreVertIcon />
-              </IconButton>
-            }
-          >
-            <ListItemButton
-              sx={{
-                borderRadius: '5px'
+        <List>
+          {listItems.map((item, index) => (
+            <ListItem
+              key={item.name}
+              sz={{
+                marginBottom: index !== listItems.length - 1 ? '8px' : 0
               }}
+              secondaryAction={
+                <IconButton onClick={(event) => handleListItemMenuOpen(event, item)}>
+                  <MoreVertIcon />
+                </IconButton>
+              }
             >
-              <ListItemText
-                primary={item.name}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Popover
-        open={listItemMenuOpen}
-        anchorEl={listItemAnchorEl}
-        onClose={handleListItemMenuClose}
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'center'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left'
-        }}
-      >
-        <MenuList>
-          <MenuItem>
-            <ListItemIcon>
-              <CreateIcon />
-            </ListItemIcon>
-            <ListItemText>Change Name</ListItemText>
-          </MenuItem>
-          <MenuItem sx={{ color: '#ff7f7f' }}>
-            <ListItemIcon sx={{ color: '#ff7f7f' }}>
-              <DeleteForeverIcon />
-            </ListItemIcon>
-            <ListItemText>Delete</ListItemText>
-          </MenuItem>
-        </MenuList>
-      </Popover>
-      <Divider />
-      <Toolbar disableGutters>
-        <IconButton onClick={handleProfileMenuOpen}>
-          <Avatar
-            src={session?.user?.image}
-            alt={session?.user?.name}
-          />
-        </IconButton>
-        <Typography>
-          {session?.user?.name}
-        </Typography>
-      </Toolbar>
-      <Popover
-        open={profileMenuOpen}
-        anchorEl={profileAnchorEl}
-        onClose={handleProfileMenuClose}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
-        }}
-        transformOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center'
-        }}
-      >
-        {session ? (
+              <ListItemButton
+                sx={{
+                  borderRadius: '5px'
+                }}
+              >
+                <Typography noWrap>
+                  {item.name}
+                </Typography>
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Popover
+          open={listItemMenuOpen}
+          anchorEl={listItemAnchorEl}
+          onClose={handleListItemMenuClose}
+          anchorOrigin={{
+            vertical: 'center',
+            horizontal: 'center'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left'
+          }}
+        >
           <MenuList>
             <MenuItem>
               <ListItemIcon>
-                <SettingsIcon />
+                <CreateIcon />
               </ListItemIcon>
-              <ListItemText>Settings</ListItemText>
+              <ListItemText>Change Name</ListItemText>
             </MenuItem>
-            <MenuItem>
-              <ListItemIcon>
-                <FeedbackIcon />
+            <MenuItem
+              onClick={() => handleListItem("Delete")}
+              sx={{ color: '#ff7f7f' }}
+            >
+              <ListItemIcon sx={{ color: '#ff7f7f' }}>
+                <DeleteForeverIcon />
               </ListItemIcon>
-              <ListItemText>Feedback</ListItemText>
-            </MenuItem>
-            <Divider />
-            <MenuItem onClick={handleSignOut} >
-              <ListItemIcon>
-                <LogoutIcon />
-              </ListItemIcon>
-              <ListItemText>Log Out</ListItemText>
+              <ListItemText>Delete</ListItemText>
             </MenuItem>
           </MenuList>
-        ) : (
-          <MenuList>
-            <MenuItem onClick={() => signIn()}>
-              <ListItemIcon>
-                <LoginIcon />
-              </ListItemIcon>
-              <ListItemText>Log In</ListItemText>
-            </MenuItem>
-          </MenuList>
-        )}
-      </Popover>
+        </Popover>
+      </Box>
+      <Box
+        sx={{
+          marginTop: 'auto',
+        }}
+      >
+        <Divider />
+        <Toolbar disableGutters>
+          <IconButton onClick={handleProfileMenuOpen}>
+            <Avatar
+              src={session?.user?.image}
+              alt={session?.user?.name}
+            />
+          </IconButton>
+          <Typography>
+            {session?.user?.name}
+          </Typography>
+        </Toolbar>
+        <Popover
+          open={profileMenuOpen}
+          anchorEl={profileAnchorEl}
+          onClose={handleProfileMenuClose}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center'
+          }}
+        >
+          {session ? (
+            <MenuList>
+              <MenuItem>
+                <ListItemIcon>
+                  <SettingsIcon />
+                </ListItemIcon>
+                <ListItemText>Settings</ListItemText>
+              </MenuItem>
+              <MenuItem>
+                <ListItemIcon>
+                  <FeedbackIcon />
+                </ListItemIcon>
+                <ListItemText>Feedback</ListItemText>
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={handleSignOut} >
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+                <ListItemText>Log Out</ListItemText>
+              </MenuItem>
+            </MenuList>
+          ) : (
+            <MenuList>
+              <MenuItem onClick={() => signIn()}>
+                <ListItemIcon>
+                  <LoginIcon />
+                </ListItemIcon>
+                <ListItemText>Log In</ListItemText>
+              </MenuItem>
+            </MenuList>
+          )}
+        </Popover>
+      </Box>
     </Drawer>
   )
 }
