@@ -5,6 +5,8 @@
 //TODO: Delete file
 //TODO: Smooth transition of hiding and showing Drawer
 //TODO: Change styling of scrollbar
+//TODO: If you're viewing that document's analysis, highlight that icon button with that item
+//TODO: After editing name of document/document analysis, move it to the top of the list (make transition look good too)
 import { useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
