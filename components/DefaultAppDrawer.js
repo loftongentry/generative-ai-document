@@ -1,3 +1,4 @@
+//TODO: Make it so, when editing the input, places you inside the input to type immediately
 //TODO: Settings modal
 //TODO: Feedback modal
 //TODO: Change name
@@ -5,7 +6,7 @@
 //TODO: Smooth transition of hiding and showing Drawer
 //TODO: Change styling of scrollbar
 import { useState } from "react";
-import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box } from '@mui/material';
+import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -26,6 +27,8 @@ const DefaultAppDrawer = (props) => {
   const [listItemAnchorEl, setListItemAnchorEl] = useState(null)
   const [listItemMenuOpen, setListItemMenuOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [editing, setEditing] = useState(false)
+  const [editedName, setEditedName] = useState('')
 
   const handleProfileMenuOpen = (event) => {
     setProfileMenuOpen(true)
@@ -57,9 +60,21 @@ const DefaultAppDrawer = (props) => {
     if (action === 'Delete') {
       const updatedList = listItems.filter(item => item.name !== selectedItem.name)
       setListItems(updatedList)
+    } else if (action === 'Change Name') {
+      setEditing(true)
+      setEditedName(selectedItem.name)
     }
 
     handleListItemMenuClose()
+  }
+
+  const handleSaveEdit = () => {
+    const updatedList = listItems.map(item =>
+      item === selectedItem ? { ...item, name: editedName } : item
+    )
+
+    setListItems(updatedList)
+    setEditing(false)
   }
 
   return (
@@ -121,9 +136,18 @@ const DefaultAppDrawer = (props) => {
                   borderRadius: '5px'
                 }}
               >
-                <Typography noWrap>
-                  {item.name}
-                </Typography>
+                {editing && selectedItem === item ? (
+                  <Input
+                    focus='true'
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    onBlur={handleSaveEdit}
+                  />
+                ) : (
+                  <Typography noWrap>
+                    {item.name}
+                  </Typography>
+                )}
               </ListItemButton>
             </ListItem>
           ))}
@@ -142,7 +166,9 @@ const DefaultAppDrawer = (props) => {
           }}
         >
           <MenuList>
-            <MenuItem>
+            <MenuItem
+              onClick={() => handleListItem('Change Name')}
+            >
               <ListItemIcon>
                 <CreateIcon />
               </ListItemIcon>
