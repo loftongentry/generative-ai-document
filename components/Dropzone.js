@@ -1,10 +1,8 @@
-//TODO: make the width of the dropzone and the file underneath it the same width
-//TODO: Shows a different icon and message if user tries to hover over and drop a document that will not be accepted (i.e. .doc, .docx, .xlsx, etc.)
-//TODO: For loading symbol, shows spinning loading logo on top of cloud, then once response is received, if succesful, show clod with checkmark, if failed, show something with an x
+//TODO: For loading symbol, shows spinning loading logo on top of cloud, then once response is received, if succesful, show cloud with checkmark, if failed, show something with an x
 //TODO: On receiving succesful response from /api/getFileData, smoothly redirects to results (like a transition slide)
-//TODO: User can only upload one document at a time
 //TODO: Not receiving a response from api call
-import { useCallback } from "react"
+//TODO: Mobile styling
+import { useState, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
 import { Box, Button, CircularProgress, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
@@ -18,8 +16,9 @@ import 'react-pdf/dist/Page/TextLayer.css';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 const Dropzone = (props) => {
-  const { drawerOpen, drawerWidth, openSnackbar } = props
+  const { drawerOpen, drawerWidth, openSnackbar, valid } = props
   const { files, setFiles } = props
+  const [loading, setLoading] = useState(false)
 
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles?.length) {
@@ -34,24 +33,92 @@ const Dropzone = (props) => {
 
   const { getRootProps, isDragActive } = useDropzone({
     onDrop,
-    validator: (newFile) => {
-      const exists = files.some(file => file.name === newFile.name)
-
-      if (!exists) {
-        return false
+    onDropRejected: (rejectedFiles) => {
+      const rejectedFile = rejectedFiles[0]
+      if (rejectedFile) {
+        openSnackbar({ message: 'Unsupported file type', severity: 'error' })
       }
-
-      openSnackbar({ message: 'Cannot upload the same file twice', severity: 'error' })
-      return true
-    }
+    },
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg'],
+      'application/pdf': ['.pdf']
+    },
   })
 
   const removeFile = (name) => {
     setFiles(files => files.filter(file => file.name !== name))
   }
 
+  const determinePreview = (file) => {
+    if (file.type === 'application/pdf') {
+      return (
+        <Document
+          file={file.preview}
+          loading={
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          }
+          error={'Failed to load PDF preview'}
+        >
+          <Page
+            pageNumber={1}
+            height={300}
+          />
+        </Document>
+      )
+    } else if (file.type.match('image\/(png|jpg|jpeg)')) {
+      return (
+        <Image
+          src={file.preview}
+          alt={file.name}
+          width={0}
+          height={0}
+          style={{
+            width: '100%',
+            height: 'auto',
+            borderRadius: '5px'
+          }}
+        />
+      )
+    }
+
+    return (
+      <Typography>
+        {file.name}
+      </Typography>
+    )
+  }
+
+  const getBytes = (fileSize) => {
+    const bytes = fileSize / 1024
+    const size = Math.floor(bytes * 100) / 100
+
+    if (size >= 1024) {
+      return `${size / 1024} MB`
+    }
+
+    return `${size} KB`
+  }
+
   const handleSubmit = async () => {
+    setLoading(true)
+
     try {
+      if (!valid) {
+        throw new Error('User is not logged in, please log in before attempting to upload documents')
+      }
+
+      if (files.length > 1) {
+        throw new Error('Can only upload one document at a time, please remove a document from the array')
+      }
+
       const uuid = localStorage.getItem('uuid')
       const formData = new FormData()
       formData.append('file', files)
@@ -67,6 +134,9 @@ const Dropzone = (props) => {
 
     } catch (error) {
       console.error(`Error uploading document to google cloud: ${error}`)
+      openSnackbar({ message: 'There was an error uploading your document, please try again later', severity: 'error' })
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -90,6 +160,7 @@ const Dropzone = (props) => {
           padding: '20px',
           width: '425px'
         }}
+        disabled={!valid || files.length === 1}
       >
         <Box
           sx={{
@@ -113,45 +184,13 @@ const Dropzone = (props) => {
             sx={{
               border: '2px #A9A9A9 dashed',
               borderRadius: '5px',
-              marginBottom: index !== files.length - 1 ? '8px' : 0
+              marginBottom: index !== files.length - 1 ? '8px' : 0,
+              width: '425px'
             }}
           >
             <Tooltip
               TransitionComponent={Zoom}
-              title={file.type === 'application/pdf' ? (
-                <Document
-                  file={file.preview}
-                  loading={
-                    <Box 
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                      }}
-                    >
-                      <CircularProgress />
-                    </Box>
-                  }
-                  error={'Failed to load PDF preview'}
-                >
-                  <Page 
-                    pageNumber={1}
-                    height={300}
-                  />
-                </Document>
-              ) : (
-                <Image
-                  src={file.preview}
-                  alt={file.name}
-                  width={0}
-                  height={0}
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    borderRadius: '5px'
-                  }}
-                />
-              )}
+              title={determinePreview(file)}
               followCursor
               componentprops={{
                 tooltip: {
@@ -172,7 +211,7 @@ const Dropzone = (props) => {
                 </ListItemIcon>
                 <ListItemText
                   primary={file.name}
-                  secondary={file.size}
+                  secondary={getBytes(file.size)}
                 />
               </ListItemButton>
             </Tooltip>
@@ -183,8 +222,14 @@ const Dropzone = (props) => {
         ))}
       </List>
       <Fade in={files.length > 0}>
-        <Button variant='contained' onClick={handleSubmit}>
-          Submit
+        <Button
+          variant='outlined'
+          onClick={handleSubmit}
+          size="large"
+          disabled={loading}
+          sx={{ minWidth: '200px', height: '48px', position: 'relative' }}
+        >
+          {loading ? <CircularProgress size={30} /> : "Submit"}
         </Button>
       </Fade>
     </Box>
