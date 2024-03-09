@@ -1,3 +1,4 @@
+//TODO: Properly position the arrow to open the drawer (Top of the drawer). Possibly make it hamburger menu that disappears when clicked
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Box, IconButton } from "@mui/material";
@@ -6,7 +7,6 @@ import DefaultAppDrawer from "@/components/DefaultAppDrawer";
 import Dropzone from "@/components/Dropzone";
 import CustomSnackbar from "@/components/CustomSnackbar";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -14,6 +14,7 @@ export default function Home() {
   const email = session?.user?.email
   const [files, setFiles] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(true)
+  const [valid, setValid] = useState(false)
   const drawerWidth = drawerOpen ? 240 : 0
 
   useEffect(() => {
@@ -36,11 +37,15 @@ export default function Home() {
       const uuid = response.uuid
 
       localStorage.setItem('uuid', uuid)
-
+      setValid(true)
     } catch (error) {
       console.error(`Error occurred when logging in user: ${error}`)
       openSnackbar({ message: 'Error signing in user', severity: 'error' })
     }
+  }
+
+  const handleDrawerOpen = () => {
+    setDrawerOpen(!drawerOpen)
   }
 
   return (
@@ -59,10 +64,12 @@ export default function Home() {
         }}
       >
         <DefaultAppDrawer
+          handleDrawerOpen={handleDrawerOpen}
           drawerWidth={drawerWidth}
+          valid={valid}
         />
-        <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
-          {drawerOpen ? <ArrowBackIcon /> : <ArrowForwardIcon />}
+        <IconButton onClick={handleDrawerOpen}>
+          {!drawerOpen && <ArrowForwardIcon />}
         </IconButton>
       </Box>
 
@@ -72,6 +79,7 @@ export default function Home() {
         drawerOpen={drawerOpen}
         drawerWidth={drawerWidth}
         openSnackbar={openSnackbar}
+        valid={valid}
       />
 
       <CustomSnackbar
