@@ -19,7 +19,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TestItems } from "@/test/TestItems";
 
 const DefaultDrawer = (props) => {
-  const { drawerOpen, handleDrawerOpen, drawerWidth, valid } = props
+  const { drawerOpen, handleDrawerOpen, drawerWidth, viewportWidth, valid } = props
   const { data: session } = useSession()
   const [listItems, setListItems] = useState(TestItems)
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
@@ -87,7 +87,7 @@ const DefaultDrawer = (props) => {
           boxSizing: 'border-box',
         },
       }}
-      variant="persistent"
+      variant={viewportWidth >= 768 ? 'persistent' : 'temporary'}
       anchor="left"
       open={drawerOpen}
     >

@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
 import { styled, useTheme } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
-import { useSnackbar } from "@/context/SnackbarContext";
+import MenuIcon from '@mui/icons-material/Menu';
 import DefaultDrawer from "@/components/DefaultDrawer";
 import Dropzone from "@/components/Dropzone";
 import CustomSnackbar from "@/components/CustomSnackbar";
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useSnackbar } from "@/context/SnackbarContext";
 
 const drawerWidth = 240
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
+  ({ theme, open, viewportwidth }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
@@ -27,8 +27,12 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       }),
       marginLeft: 0,
     }),
+    ...(viewportwidth < 768 && {
+      marginLeft: 0,
+    }),
   }),
-)
+);
+
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -61,8 +65,16 @@ export default function Home() {
   const theme = useTheme()
   const email = session?.user?.email
   const [files, setFiles] = useState([])
-  const [drawerOpen, setDrawerOpen] = useState(true)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const [valid, setValid] = useState(true)
+  const [viewportWidth, setViewportWidth] = useState(0)
+
+  useEffect(() => {
+    setViewportWidth(window.innerWidth)
+    if (window.innerWidth >= 768) {
+      setDrawerOpen(true)
+    }
+  }, [])
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -70,26 +82,26 @@ export default function Home() {
     }
   }, [status])
 
-  const validateUser = async () => {
+  const validateUser = useCallback(async () => {
     try {
       const res = await fetch(`/api/auth/validate/${email}`, {
         method: 'GET',
-      })
+      });
 
       if (!res.ok) {
-        throw new Error(`${res.status} - ${res.statusText}`)
+        throw new Error(`${res.status} - ${res.statusText}`);
       }
 
-      const response = await res.json()
-      const uuid = response.uuid
+      const response = await res.json();
+      const uuid = response.uuid;
 
-      localStorage.setItem('uuid', uuid)
-      setValid(true)
+      localStorage.setItem('uuid', uuid);
+      setValid(true);
     } catch (error) {
-      console.error(`Error occurred when logging in user: ${error}`)
-      openSnackbar({ message: 'Error signing in user', severity: 'error' })
+      console.error(`Error occurred when logging in user: ${error}`);
+      openSnackbar({ message: 'Error signing in user', severity: 'error' });
     }
-  }
+  }, [email, openSnackbar]);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(!drawerOpen)
@@ -106,7 +118,7 @@ export default function Home() {
             edge="start"
             sx={{ mr: 2, ...(open && { display: 'none' }) }}
           >
-            <ArrowForwardIcon />
+            <MenuIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -115,10 +127,14 @@ export default function Home() {
         drawerOpen={drawerOpen}
         handleDrawerOpen={handleDrawerOpen}
         drawerWidth={drawerWidth}
+        viewportWidth={viewportWidth}
         valid={valid}
       />
 
-      <Main open={drawerOpen}>
+      <Main
+        open={drawerOpen}
+        viewportwidth={viewportWidth}
+      >
         <DrawerHeader />
         <Dropzone
           files={files}
