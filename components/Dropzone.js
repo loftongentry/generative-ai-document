@@ -16,8 +16,7 @@ import 'react-pdf/dist/Page/TextLayer.css';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 const Dropzone = (props) => {
-  const { drawerOpen, drawerWidth, openSnackbar, valid } = props
-  const { files, setFiles } = props
+  const { files, setFiles, openSnackbar, valid } = props
   const [loading, setLoading] = useState(false)
 
   const onDrop = useCallback(acceptedFiles => {
@@ -147,7 +146,6 @@ const Dropzone = (props) => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        width: drawerOpen ? `calc(100vw - ${drawerWidth}px)` : '100vw',
       }}
     >
       <IconButton

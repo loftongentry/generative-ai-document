@@ -1,21 +1,68 @@
-//TODO: Properly position the arrow to open the drawer (Top of the drawer). Possibly make it hamburger menu that disappears when clicked
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Box, IconButton } from "@mui/material";
+import { Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
+import { styled, useTheme } from '@mui/material/styles';
+import MuiAppBar from '@mui/material/AppBar';
 import { useSnackbar } from "@/context/SnackbarContext";
-import DefaultAppDrawer from "@/components/DefaultAppDrawer";
+import DefaultDrawer from "@/components/DefaultDrawer";
 import Dropzone from "@/components/Dropzone";
 import CustomSnackbar from "@/components/CustomSnackbar";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
+const drawerWidth = 240
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}px`,
+    ...(open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+  }),
+)
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  transition: theme.transitions.create(['margin', 'width'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}))
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-end',
+}))
+
 export default function Home() {
   const { data: session, status } = useSession()
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
+  const theme = useTheme()
   const email = session?.user?.email
   const [files, setFiles] = useState([])
   const [drawerOpen, setDrawerOpen] = useState(true)
-  const [valid, setValid] = useState(false)
-  const drawerWidth = drawerOpen ? 240 : 0
+  const [valid, setValid] = useState(true)
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -49,38 +96,37 @@ export default function Home() {
   }
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        width: '100vw',
-        height: '100vh'
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        <DefaultAppDrawer
-          handleDrawerOpen={handleDrawerOpen}
-          drawerWidth={drawerWidth}
-          valid={valid}
-        />
-        <IconButton onClick={handleDrawerOpen}>
-          {!drawerOpen && <ArrowForwardIcon />}
-        </IconButton>
-      </Box>
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar>
+        <Toolbar>
+          <IconButton
+            onClick={handleDrawerOpen}
+            color="inherit"
+            edge="start"
+            sx={{ mr: 2, ...(open && { display: 'none' }) }}
+          >
+            <ArrowForwardIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
 
-      <Dropzone
-        files={files}
-        setFiles={setFiles}
+      <DefaultDrawer
         drawerOpen={drawerOpen}
+        handleDrawerOpen={handleDrawerOpen}
         drawerWidth={drawerWidth}
-        openSnackbar={openSnackbar}
         valid={valid}
       />
+
+      <Main open={drawerOpen}>
+        <DrawerHeader />
+        <Dropzone
+          files={files}
+          setFiles={setFiles}
+          openSnackbar={openSnackbar}
+          valid={valid}
+        />
+      </Main>
 
       <CustomSnackbar
         open={open}

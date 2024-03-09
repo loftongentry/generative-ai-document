@@ -1,8 +1,6 @@
-//TODO: Move the arrow to show drawer to this compoenent?
 //TODO: Make it so, when editing the input, places you inside the input to type immediately
 //TODO: Settings modal
 //TODO: Feedback modal
-//TODO: Smooth transition of hiding and showing Drawer
 //TODO: Change styling of scrollbar
 //TODO: If you're viewing that document's analysis, highlight that icon button with that item
 //TODO: Make transition of item moving to the top of the list smoother
@@ -20,8 +18,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TestItems } from "@/test/TestItems";
 
-const DefaultAppDrawer = (props) => {
-  const { handleDrawerOpen, drawerWidth, valid } = props
+const DefaultDrawer = (props) => {
+  const { drawerOpen, handleDrawerOpen, drawerWidth, valid } = props
   const { data: session } = useSession()
   const [listItems, setListItems] = useState(TestItems)
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
@@ -81,15 +79,17 @@ const DefaultAppDrawer = (props) => {
 
   return (
     <Drawer
-      open={true}
-      variant='persistent'
       sx={{
         width: drawerWidth,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
           width: drawerWidth,
+          boxSizing: 'border-box',
         },
       }}
+      variant="persistent"
+      anchor="left"
+      open={drawerOpen}
     >
       <Toolbar
         sx={{
@@ -259,4 +259,4 @@ const DefaultAppDrawer = (props) => {
   )
 }
 
-export default DefaultAppDrawer
+export default DefaultDrawer
