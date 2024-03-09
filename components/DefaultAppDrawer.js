@@ -1,3 +1,4 @@
+//TODO: Move the arrow to show drawer to this compoenent?
 //TODO: Make it so, when editing the input, places you inside the input to type immediately
 //TODO: Settings modal
 //TODO: Feedback modal
