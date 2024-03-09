@@ -1,14 +1,12 @@
 //TODO: Make it so, when editing the input, places you inside the input to type immediately
 //TODO: Settings modal
 //TODO: Feedback modal
-//TODO: Change name
-//TODO: Delete file
 //TODO: Smooth transition of hiding and showing Drawer
 //TODO: Change styling of scrollbar
 //TODO: If you're viewing that document's analysis, highlight that icon button with that item
-//TODO: After editing name of document/document analysis, move it to the top of the list (make transition look good too)
+//TODO: Make transition of item moving to the top of the list smoother
 import { useState } from "react";
-import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input } from '@mui/material';
+import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -18,10 +16,11 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TestItems } from "@/test/TestItems";
 
 const DefaultAppDrawer = (props) => {
-  const { drawerWidth } = props
+  const { handleDrawerOpen, drawerWidth, valid } = props
   const { data: session } = useSession()
   const [listItems, setListItems] = useState(TestItems)
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
@@ -70,10 +69,10 @@ const DefaultAppDrawer = (props) => {
     handleListItemMenuClose()
   }
 
+  //This is done to set the edited item to the top of the list after it's name has been changed
   const handleSaveEdit = () => {
-    const updatedList = listItems.map(item =>
-      item === selectedItem ? { ...item, name: editedName } : item
-    )
+    const filteredList = listItems.filter(item => item !== selectedItem)
+    const updatedList = [{ ...selectedItem, name: editedName }, ...filteredList]
 
     setListItems(updatedList)
     setEditing(false)
@@ -95,7 +94,6 @@ const DefaultAppDrawer = (props) => {
         sx={{
           justifyContent: 'center',
         }}
-        disableGutters
       >
         <IconButton
           sx={{
@@ -107,11 +105,15 @@ const DefaultAppDrawer = (props) => {
             borderRadius: '5px',
             gap: '5px'
           }}
+          disabled={!valid}
         >
           <InsertDriveFileIcon />
           <Typography>
             New Upload
           </Typography>
+        </IconButton>
+        <IconButton onClick={handleDrawerOpen}>
+          <ArrowBackIcon />
         </IconButton>
       </Toolbar>
       <Divider />
