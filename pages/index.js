@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { Box, CssBaseline, IconButton, Toolbar } from "@mui/material";
+import { Box, IconButton, Toolbar } from "@mui/material";
 import { styled, useTheme } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -31,8 +31,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       marginLeft: 0,
     }),
   }),
-);
-
+)
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -109,7 +108,6 @@ export default function Home() {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
       <AppBar>
         <Toolbar>
           <IconButton

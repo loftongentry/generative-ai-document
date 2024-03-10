@@ -4,8 +4,8 @@
 //TODO: Change styling of scrollbar
 //TODO: If you're viewing that document's analysis, highlight that icon button with that item
 //TODO: Make transition of item moving to the top of the list smoother
-import { useState } from "react";
-import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon } from '@mui/material';
+import { useEffect, useState } from "react";
+import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon, CssBaseline } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -91,6 +91,7 @@ const DefaultDrawer = (props) => {
       anchor="left"
       open={drawerOpen}
     >
+      <CssBaseline />
       <Toolbar
         sx={{
           justifyContent: 'center',
@@ -121,17 +122,30 @@ const DefaultDrawer = (props) => {
       <Box
         sx={{
           overflowY: 'auto',
+          '&::-webkit-scrollbar': {
+            width: '5px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            borderRadius: '8px',
+            minHeight: '24px',
+            backgroundColor: 'transparent'
+          },
+          '&:hover::-webkit-scrollbar-thumb': {
+            backgroundColor: '#b7b7b7'
+          }
         }}
       >
         <List>
           {listItems.map((item, index) => (
             <ListItem
               key={item.name}
-              sz={{
-                marginBottom: index !== listItems.length - 1 ? '8px' : 0
+              sx={{
+                marginBottom: index !== listItems.length - 1 ? '8px' : 0,
               }}
               secondaryAction={
-                <IconButton onClick={(event) => handleListItemMenuOpen(event, item)}>
+                <IconButton
+                  onClick={(event) => handleListItemMenuOpen(event, item)}
+                >
                   <MoreVertIcon />
                 </IconButton>
               }
