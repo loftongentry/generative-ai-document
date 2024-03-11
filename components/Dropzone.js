@@ -16,17 +16,13 @@ import 'react-pdf/dist/Page/TextLayer.css';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 const Dropzone = (props) => {
-  const { files, setFiles, openSnackbar, valid } = props
+  const { file, setFile, openSnackbar, valid } = props
   const [loading, setLoading] = useState(false)
 
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles?.length) {
-      setFiles(prev => ([
-        ...prev,
-        ...acceptedFiles.map(file => (
-          Object.assign(file, { preview: URL.createObjectURL(file) })
-        ))
-      ]))
+      const file = acceptedFiles[0]
+      setFile(Object.assign(file, { preview: URL.createObjectURL(file) }))
     }
   }, [])
 
@@ -43,10 +39,6 @@ const Dropzone = (props) => {
       'application/pdf': ['.pdf']
     },
   })
-
-  const removeFile = (name) => {
-    setFiles(files => files.filter(file => file.name !== name))
-  }
 
   const determinePreview = (file) => {
     if (file.type === 'application/pdf') {
@@ -114,13 +106,9 @@ const Dropzone = (props) => {
         throw new Error('User is not logged in, please log in before attempting to upload documents')
       }
 
-      if (files.length > 1) {
-        throw new Error('Can only upload one document at a time, please remove a document from the array')
-      }
-
       const uuid = localStorage.getItem('uuid')
       const formData = new FormData()
-      formData.append('file', files)
+      formData.append('file', file)
 
       const res = await fetch(`/api/upload/${uuid}`, {
         method: 'POST',
@@ -158,7 +146,7 @@ const Dropzone = (props) => {
           padding: '20px',
           width: '425px'
         }}
-        disabled={!valid || files.length === 1}
+        disabled={!valid || file !== null}
       >
         <Box
           sx={{
@@ -176,13 +164,12 @@ const Dropzone = (props) => {
       </IconButton>
 
       <List>
-        {files.map((file, index) => (
+        {file && (
           <ListItem
             key={file.name}
             sx={{
               border: '2px #A9A9A9 dashed',
               borderRadius: '5px',
-              marginBottom: index !== files.length - 1 ? '8px' : 0,
               width: '425px'
             }}
           >
@@ -213,13 +200,13 @@ const Dropzone = (props) => {
                 />
               </ListItemButton>
             </Tooltip>
-            <IconButton onClick={() => removeFile(file.name)}>
+            <IconButton onClick={() => setFile(null)}>
               <DeleteForever sx={{ fontSize: 40, color: 'red' }} />
             </IconButton>
           </ListItem>
-        ))}
+        )}
       </List>
-      <Fade in={files.length > 0}>
+      <Fade in={file !== null}>
         <Button
           variant='outlined'
           onClick={handleSubmit}

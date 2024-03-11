@@ -63,7 +63,7 @@ export default function Home() {
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
   const theme = useTheme()
   const email = session?.user?.email
-  const [files, setFiles] = useState([])
+  const [file, setFile] = useState(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [valid, setValid] = useState(true)
   const [viewportWidth, setViewportWidth] = useState(0)
@@ -135,8 +135,8 @@ export default function Home() {
       >
         <DrawerHeader />
         <Dropzone
-          files={files}
-          setFiles={setFiles}
+          file={file}
+          setFile={setFile}
           openSnackbar={openSnackbar}
           valid={valid}
         />
