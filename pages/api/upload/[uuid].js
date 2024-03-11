@@ -13,21 +13,21 @@ export const config = {
   api: {
     bodyParser: false
   }
-};
+}
 
 export default async function handler(req, res) {
   const { method, query: { uuid } } = req;
   const session = await getServerSession(req, res, authOptions);
 
   if (!session) {
-    return res.status(401).json({ error: 'User must be logged in to perform this action' });
+    return res.status(401).json({ error: 'User must be logged in to perform this action' })
   }
 
   if (method === 'POST') {
     try {
-      const key = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS.toString());
-      const form = formidable({});
-      form.keepExtensions = true;
+      const key = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS.toString())
+      const form = formidable({})
+      form.keepExtensions = true
 
       form.parse(req, async (error, fields, files) => {
         if (error) {
@@ -41,26 +41,26 @@ export default async function handler(req, res) {
             client_email: key.client_email,
             private_key: key.private_key.replace(/\\n/g, '\n')
           }
-        });
+        })
 
         const selectedFile = files.file[0];
-        const salt = crypto.randomBytes(16).toString('hex');
-        const hashedFilename = crypto.createHash('sha256').update(selectedFile.originalFilename + salt).digest('hex');
+        const salt = crypto.randomBytes(16).toString('hex')
+        const hashedFilename = crypto.createHash('sha256').update(selectedFile.originalFilename + salt).digest('hex')
 
-        const bucket = storage.bucket(process.env.CLOUD_STORAGE_BUCKET_NAME);
-        const blob = bucket.file(hashedFilename);
+        const bucket = storage.bucket(process.env.CLOUD_STORAGE_BUCKET_NAME)
+        const blob = bucket.file(hashedFilename)
 
         const blobStream = createReadStream(selectedFile.filepath)
           .pipe(blob.createWriteStream({
             resumable: false,
             contentType: selectedFile.mimetype
-          }));
+          }))
 
         blobStream.on('error', (error) => {
-          console.error(`Error uploading files to cloud storage: ${error}`);
-          cleanupStreams(blobStream, selectedFile.filepath);
-          return res.status(500).json({ error: 'Error uploading files to cloud storage' });
-        });
+          console.error(`Error uploading files to cloud storage: ${error}`)
+          cleanupStreams(blobStream, selectedFile.filepath)
+          return res.status(500).json({ error: 'Error uploading files to cloud storage' })
+        })
 
         blobStream.on('finish', async () => {
           try {
@@ -73,34 +73,35 @@ export default async function handler(req, res) {
                 HASHED_FILE_NAME: hashedFilename,
                 SALT: salt,
               }
-            });
-            cleanupStreams(blobStream, selectedFile.filepath);
-            return res.status(201).json({ message: `Uploaded the file successfully: ${selectedFile.newFilename}` });
+            })
+
+            cleanupStreams(blobStream, selectedFile.filepath)
+            return res.status(201).json({ message: `Uploaded the file successfully: ${selectedFile.newFilename}` })
           } catch (error) {
-            console.error(`Error setting metadata: ${error}`);
-            cleanupStreams(blobStream, selectedFile.filepath);
-            return res.status(500).json({ error: 'Error setting metadata' });
+            console.error(`Error setting metadata: ${error}`)
+            cleanupStreams(blobStream, selectedFile.filepath)
+            return res.status(500).json({ error: 'Error setting metadata' })
           }
-        });
-      });
+        })
+      })
     } catch (error) {
-      console.error(`Error during file upload to cloud storage: ${error}`);
-      return res.status(500).json({ error: 'Error during file upload to cloud storage' });
+      console.error(`Error during file upload to cloud storage: ${error}`)
+      return res.status(500).json({ error: 'Error during file upload to cloud storage' })
     }
   } else {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method not allowed' })
   }
 }
 
 function cleanupStreams(stream, filepath) {
   if (stream) {
-    stream.end();
+    stream.end()
   }
   if (filepath) {
-    unlink(filepath, (err) => {
-      if (err) {
-        console.error(`Error deleting file: ${err}`);
+    unlink(filepath, (error) => {
+      if (error) {
+        console.error(`Error deleting file: ${error}`)
       }
-    });
+    })
   }
 }
