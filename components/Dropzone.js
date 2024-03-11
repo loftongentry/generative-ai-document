@@ -41,6 +41,10 @@ const Dropzone = (props) => {
   })
 
   const determinePreview = (file) => {
+    if (!file) {
+      return
+    }
+
     if (file.type === 'application/pdf') {
       return (
         <Document
@@ -163,10 +167,10 @@ const Dropzone = (props) => {
         </Box>
       </IconButton>
 
-      <List>
-        {file && (
+      <Fade in={file !== null} out={file === null}>
+        <List>
           <ListItem
-            key={file.name}
+            key={file?.name}
             sx={{
               border: '2px #A9A9A9 dashed',
               borderRadius: '5px',
@@ -186,7 +190,7 @@ const Dropzone = (props) => {
               }}
             >
               <ListItemButton
-                key={file.name}
+                key={file?.name}
                 sx={{
                   borderRadius: '5px'
                 }}
@@ -195,8 +199,8 @@ const Dropzone = (props) => {
                   <DescriptionIcon sx={{ fontSize: 40 }} />
                 </ListItemIcon>
                 <ListItemText
-                  primary={file.name}
-                  secondary={getBytes(file.size)}
+                  primary={file?.name}
+                  secondary={getBytes(file?.size)}
                 />
               </ListItemButton>
             </Tooltip>
@@ -204,8 +208,9 @@ const Dropzone = (props) => {
               <DeleteForever sx={{ fontSize: 40, color: 'red' }} />
             </IconButton>
           </ListItem>
-        )}
-      </List>
+        </List>
+      </Fade>
+
       <Fade in={file !== null}>
         <Button
           variant='outlined'
