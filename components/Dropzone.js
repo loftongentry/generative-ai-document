@@ -1,14 +1,14 @@
 //TODO: For loading symbol, shows spinning loading logo on top of cloud, then once response is received, if succesful, show cloud with checkmark, if failed, show something with an x
 //TODO: On receiving succesful response from /api/getFileData, smoothly redirects to results (like a transition slide)
 //TODO: Not receiving a response from api call
-//TODO: Mobile styling
+//TODO: Drag and drop icon button does not inherit changes in color
 import { useState, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
 import { Box, Button, CircularProgress, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
 import BackupIcon from '@mui/icons-material/Backup';
 import DescriptionIcon from '@mui/icons-material/Description';
-import { DeleteForever } from "@mui/icons-material";
+import DeleteForever from "@mui/icons-material/DeleteForever";
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
