@@ -1,10 +1,9 @@
 //TODO: Make it so, when editing the input, places you inside the input to type immediately
 //TODO: Settings modal
-//TODO: Feedback modal
 //TODO: Change styling of scrollbar
 //TODO: If you're viewing that document's analysis, highlight that icon button with that item
 //TODO: Make transition of item moving to the top of the list smoother
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon, CssBaseline } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
@@ -17,6 +16,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TestItems } from "@/test/TestItems";
+import SettingsModal from "./DrawerComponents/SettingsModal";
 
 const DefaultDrawer = (props) => {
   const { drawerOpen, handleDrawerOpen, drawerWidth, viewportWidth, valid } = props
@@ -29,6 +29,7 @@ const DefaultDrawer = (props) => {
   const [selectedItem, setSelectedItem] = useState(null)
   const [editing, setEditing] = useState(false)
   const [editedName, setEditedName] = useState('')
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
   const handleProfileMenuOpen = (event) => {
     setProfileMenuOpen(true)
@@ -75,6 +76,10 @@ const DefaultDrawer = (props) => {
 
     setListItems(updatedList)
     setEditing(false)
+  }
+
+  const handleCloseSettingsModal = () => {
+    setSettingsModalOpen(false)
   }
 
   return (
@@ -237,7 +242,7 @@ const DefaultDrawer = (props) => {
         >
           {session ? (
             <MenuList>
-              <MenuItem>
+              <MenuItem onClick={() => setSettingsModalOpen(true)}>
                 <ListItemIcon>
                   <SettingsIcon />
                 </ListItemIcon>
@@ -269,6 +274,10 @@ const DefaultDrawer = (props) => {
           )}
         </Popover>
       </Box>
+      <SettingsModal 
+        settingsModalOpen={settingsModalOpen}     
+        handleCloseSettingsModal={handleCloseSettingsModal}
+      />
     </Drawer>
   )
 }
