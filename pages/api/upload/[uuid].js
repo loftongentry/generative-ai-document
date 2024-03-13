@@ -68,10 +68,7 @@ export default async function handler(req, res) {
               metadata: {
                 UUID: uuid,
                 FILE_NAME: selectedFile.originalFilename,
-                FILE_TYPE: selectedFile.mimetype,
                 CREATION_DATE: getDate(),
-                HASHED_FILE_NAME: hashedFilename,
-                SALT: salt,
               }
             })
 
