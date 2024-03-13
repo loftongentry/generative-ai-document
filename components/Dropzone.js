@@ -1,7 +1,7 @@
 //TODO: For loading symbol, shows spinning loading logo on top of cloud, then once response is received, if succesful, show cloud with checkmark, if failed, show something with an x
 //TODO: On receiving succesful response from /api/getFileData, smoothly redirects to results (like a transition slide)
 //TODO: Not receiving a response from api call
-//TODO: Drag and drop icon button does not inherit changes in color
+//TODO: Drag and drop icon button does not inherit changes in color (error appearing)
 import { useState, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
@@ -167,6 +167,7 @@ const Dropzone = (props) => {
         </Box>
       </IconButton>
 
+      {/* Error here with the 'out' prop */}
       <Fade in={file !== null} out={file === null}>
         <List>
           <ListItem
