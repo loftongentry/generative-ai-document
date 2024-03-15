@@ -14,6 +14,7 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+const maxSize = 1024 * 1024 * 5
 
 const Dropzone = (props) => {
   const { file, setFile, openSnackbar, valid } = props
@@ -31,13 +32,18 @@ const Dropzone = (props) => {
     onDropRejected: (rejectedFiles) => {
       const rejectedFile = rejectedFiles[0]
       if (rejectedFile) {
-        openSnackbar({ message: 'Unsupported file type', severity: 'error' })
+        if (rejectedFile.file.size > maxSize) {
+          openSnackbar({ message: 'Document size too large', severity: 'error' })
+        } else {
+          openSnackbar({ message: 'Docoment type not supported', severity: 'error' })
+        }
       }
     },
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg'],
       'application/pdf': ['.pdf']
     },
+    maxSize: maxSize
   })
 
   const determinePreview = (file) => {
@@ -96,7 +102,8 @@ const Dropzone = (props) => {
     const size = Math.floor(bytes * 100) / 100
 
     if (size >= 1024) {
-      return `${size / 1024} MB`
+      const mbSize = (size / 1024).toFixed(2)
+      return `${mbSize} MB`
     }
 
     return `${size} KB`
