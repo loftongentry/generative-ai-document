@@ -274,8 +274,8 @@ const DefaultDrawer = (props) => {
           )}
         </Popover>
       </Box>
-      <SettingsModal 
-        settingsModalOpen={settingsModalOpen}     
+      <SettingsModal
+        settingsModalOpen={settingsModalOpen}
         handleCloseSettingsModal={handleCloseSettingsModal}
       />
     </Drawer>
