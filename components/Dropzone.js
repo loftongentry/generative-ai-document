@@ -132,6 +132,7 @@ const Dropzone = (props) => {
       }
 
       URL.revokeObjectURL(file.preview)
+      setFile('')
     } catch (error) {
       console.error(`Error uploading document to google cloud: ${error}`)
       openSnackbar({ message: 'There was an error uploading your document, please try again later', severity: 'error' })
@@ -231,7 +232,11 @@ const Dropzone = (props) => {
           onClick={handleSubmit}
           size="large"
           disabled={loading}
-          sx={{ minWidth: '200px', height: '48px', position: 'relative' }}
+          sx={{
+            minWidth: '200px',
+            height: '48px',
+            position: 'relative'
+          }}
         >
           {loading ? <CircularProgress size={30} /> : "Submit"}
         </Button>
