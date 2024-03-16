@@ -3,13 +3,13 @@
 //TODO: Change styling of scrollbar
 //TODO: If you're viewing that document's analysis, highlight that icon button with that item
 //TODO: Make transition of item moving to the top of the list smoother
+//TODO: For each of the ListItems, the onBlur should send an API request to google cloud, which changes the name (should also make the mouse non-clickable and spinning logo)
 import { useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon, CssBaseline } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
-import FeedbackIcon from '@mui/icons-material/Feedback';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateIcon from '@mui/icons-material/Create';
@@ -54,6 +54,7 @@ const DefaultDrawer = (props) => {
 
   const handleSignOut = async () => {
     localStorage.removeItem('uuid')
+    handleProfileMenuClose()
     signOut()
   }
 
@@ -78,7 +79,12 @@ const DefaultDrawer = (props) => {
     setEditing(false)
   }
 
-  const handleCloseSettingsModal = () => {
+  const handleSettingsModalOpen = () => {
+    setSettingsModalOpen(true)
+    handleProfileMenuClose()
+  }
+
+  const handleSettingsModalClose = () => {
     setSettingsModalOpen(false)
   }
 
@@ -242,17 +248,11 @@ const DefaultDrawer = (props) => {
         >
           {session ? (
             <MenuList>
-              <MenuItem onClick={() => setSettingsModalOpen(true)}>
+              <MenuItem onClick={handleSettingsModalOpen}>
                 <ListItemIcon>
                   <SettingsIcon />
                 </ListItemIcon>
                 <ListItemText>Settings</ListItemText>
-              </MenuItem>
-              <MenuItem>
-                <ListItemIcon>
-                  <FeedbackIcon />
-                </ListItemIcon>
-                <ListItemText>Feedback</ListItemText>
               </MenuItem>
               <Divider />
               <MenuItem onClick={handleSignOut} >
@@ -276,7 +276,8 @@ const DefaultDrawer = (props) => {
       </Box>
       <SettingsModal
         settingsModalOpen={settingsModalOpen}
-        handleCloseSettingsModal={handleCloseSettingsModal}
+        handleSettingsModalClose={handleSettingsModalClose}
+        viewportWidth={viewportWidth}
       />
     </Drawer>
   )
