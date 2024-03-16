@@ -7,6 +7,7 @@
 import { useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon, CssBaseline } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
+import SettingsModal from "./DrawerComponents/SettingsModal";
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -16,7 +17,6 @@ import CreateIcon from '@mui/icons-material/Create';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TestItems } from "@/test/TestItems";
-import SettingsModal from "./DrawerComponents/SettingsModal";
 
 const DefaultDrawer = (props) => {
   const { drawerOpen, handleDrawerOpen, drawerWidth, viewportWidth, valid } = props
