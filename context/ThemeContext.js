@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const ThemeContext = createContext()
 
-const useTheme = () => useContext(ThemeContext)
+const useThemeContext = () => useContext(ThemeContext)
 
 export const ThemeModeProviderComponent = ({ children }) => {
   const systemTheme = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -65,20 +65,23 @@ export const ThemeModeProviderComponent = ({ children }) => {
   return (
     <ThemeContext.Provider value={{ selectedTheme, handleThemeChange }}>
       <ThemeProvider theme={themes[selectedTheme]}>
-        {children}
+          {children}
       </ThemeProvider>
     </ThemeContext.Provider>
   )
 }
 
 export const ThemeSelector = () => {
-  const { selectedTheme, handleThemeChange } = useTheme()
+  const { selectedTheme, handleThemeChange } = useThemeContext()
+
+  if (typeof window === 'undefined') return null
 
   return (
     <FormControl>
       <Select
         value={selectedTheme}
         onChange={handleThemeChange}
+        size="small"
       >
         <MenuItem value='system'>System</MenuItem>
         <MenuItem value='dark'>Dark</MenuItem>
