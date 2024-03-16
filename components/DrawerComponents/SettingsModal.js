@@ -1,21 +1,94 @@
-//TODO: Feedback should also be in settings modal. Use a smooth transition between both portions of code
 import { useState } from "react";
-import { Box, Button, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, List, ListItemButton, Stack, TextField, Typography } from "@mui/material"
+import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material"
 import { ThemeSelector } from "@/context/ThemeContext";
 import CloseIcon from '@mui/icons-material/Close';
 import SettingsIcon from '@mui/icons-material/Settings';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 
 const SettingsModal = (props) => {
-  const { settingsModalOpen, handleSettingsModalClose } = props
-  const [selectedSetting, setSelectedSetting] = useState('Option 1')
+  const { settingsModalOpen, handleSettingsModalClose, viewportWidth } = props
+  const [selectedSetting, setSelectedSetting] = useState(0)
   const [feedback, setFeedback] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const getSettingsContent = () => {
-    switch (selectedSetting) {
-      case 'Option 1':
-        return (
-          <>
+  const handleSubmit = async () => {
+    try {
+
+    } catch (error) {
+
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog
+      fullWidth={true}
+      maxWidth='sm'
+      open={settingsModalOpen}
+    >
+      <DialogTitle>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+        >
+          <Typography variant="h5">
+            Settings
+          </Typography>
+          <IconButton onClick={handleSettingsModalClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <DialogContent
+        dividers
+        sx={{
+          display: 'flex',
+          flexDirection: viewportWidth > 768 ? 'row' : 'column',
+          alignItems: viewportWidth <= 768 ? 'center' : ''
+        }}
+      >
+        <Tabs
+          orientation={viewportWidth > 768 ? "vertical" : 'horizontal'}
+          value={selectedSetting}
+          onChange={(event, newValue) => setSelectedSetting(newValue)}
+          sx={{
+            borderRight: viewportWidth > 768 ? 1 : 0,
+            borderColor: 'divider',
+          }}
+        >
+          <Tab label={
+            <Typography
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              Settings
+              <SettingsIcon />
+            </Typography>
+          } {...a11yProps(0)} />
+          <Tab label={
+            <Typography
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              Feedback
+              <FeedbackIcon />
+            </Typography>
+          } {...a11yProps(1)} />
+        </Tabs>
+        <TabPanel value={selectedSetting} index={0} viewportWidth={viewportWidth}>
+          <Stack
+            spacing={1}
+          >
             <Box
               sx={{
                 display: 'flex',
@@ -69,106 +142,74 @@ const SettingsModal = (props) => {
                 Delete Account
               </Button>
             </Box>
-          </>
-        )
-      case 'Option 2':
-        return (
-          <>
+          </Stack>
+        </TabPanel>
+        <TabPanel value={selectedSetting} index={1} viewportWidth={viewportWidth}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '10px'
+            }}
+          >
             <TextField
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               label='Feedback'
               multiline
               rows={4}
+              sx={{
+                width: '100%'
+              }}
             />
             <Button
               variant='contained'
+              onClick={handleSubmit}
+              disabled={loading}
+              sx={{
+                minWidth: '180px',
+              }}
             >
-              Submit Feedback
+             {loading ? <CircularProgress size={24} /> : 'Submit Feedback'}
             </Button>
-          </>
-        )
-      default:
-        return null
-    }
-  }
-
-  return (
-    <Dialog
-      fullWidth={true}
-      maxWidth='sm'
-      open={settingsModalOpen}
-    >
-      <DialogTitle>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}
-        >
-          <Typography variant="h5">
-            Settings
-          </Typography>
-          <IconButton onClick={handleSettingsModalClose}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-      </DialogTitle>
-      <DialogContent
-        dividers
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between'
-        }}
-      >
-        <Grid
-          container
-        >
-          <Grid item xs={3}>
-            <List>
-              <ListItemButton
-                selected={selectedSetting === 'Option 1'}
-                onClick={() => setSelectedSetting('Option 1')}
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  borderRadius: '5px',
-                  marginBottom: '5px',
-                }}
-              >
-                Option 1
-                <SettingsIcon />
-              </ListItemButton>
-              <ListItemButton
-                selected={selectedSetting === 'Option 2'}
-                onClick={() => setSelectedSetting('Option 2')}
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  borderRadius: '5px'
-                }}
-              >
-                Option 2
-                <FeedbackIcon />
-              </ListItemButton>
-            </List>
-          </Grid>
-          <Grid item xs={1} sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Divider orientation="vertical" />
-          </Grid>
-          <Grid item xs={8}>
-            <Stack
-              spacing={1}
-            >
-              {getSettingsContent()}
-            </Stack>
-          </Grid>
-        </Grid>
+          </Box>
+        </TabPanel>
       </DialogContent>
     </Dialog>
   )
 }
 
 export default SettingsModal
+
+const TabPanel = (props) => {
+  const { children, value, index, viewportWidth } = props
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      style={{
+        flexGrow: 1,
+        width: viewportWidth <= 768 ? '100%' : ''
+      }}
+    >
+      {value === index && (
+        <Box
+          sx={{
+            p: 2
+          }}
+        >
+          {children}
+        </Box>
+      )}
+    </div>
+  )
+}
+
+const a11yProps = (index) => {
+  return {
+    id: `vertical-tab-${index}`,
+    'aria-controls': `vertical-tabpanel-${index}`,
+  }
+}
