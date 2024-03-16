@@ -1,7 +1,8 @@
 //TODO: For loading symbol, shows spinning loading logo on top of cloud, then once response is received, if succesful, show cloud with checkmark, if failed, show something with an x
 //TODO: On receiving succesful response from /api/getFileData, smoothly redirects to results (like a transition slide)
 //TODO: Not receiving a response from api call
-//TODO: Drag and drop icon button does not inherit changes in color (error appearing)
+//TODO: Drag and drop icon button does not inherit changes in color (error appearing) (Maybe change to button, and change the styling of the inner text)
+//TODO: Revoke data uri after submission
 import { useState, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
@@ -130,6 +131,7 @@ const Dropzone = (props) => {
         throw new Error(`${res.status} - ${res.statusText}`)
       }
 
+      URL.revokeObjectURL(file.preview)
     } catch (error) {
       console.error(`Error uploading document to google cloud: ${error}`)
       openSnackbar({ message: 'There was an error uploading your document, please try again later', severity: 'error' })
@@ -167,7 +169,11 @@ const Dropzone = (props) => {
             gap: '10px'
           }}
         >
-          <BackupIcon sx={{ fontSize: 100 }} />
+          <BackupIcon
+            sx={{
+              fontSize: 100,
+            }}
+          />
           <Typography>
             {isDragActive ? 'Drop the files here...' : 'Drag and drop some files here, or click to select files'}
           </Typography>
