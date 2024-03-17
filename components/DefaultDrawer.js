@@ -19,7 +19,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TestItems } from "@/test/TestItems";
 
 const DefaultDrawer = (props) => {
-  const { drawerOpen, handleDrawerOpen, drawerWidth, viewportWidth, valid } = props
+  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, valid } = props
   const { data: session } = useSession()
   const [listItems, setListItems] = useState(TestItems)
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
@@ -125,7 +125,7 @@ const DefaultDrawer = (props) => {
             New Upload
           </Typography>
         </IconButton>
-        <IconButton onClick={handleDrawerOpen}>
+        <IconButton onClick={handleDrawer}>
           <ArrowBackIcon />
         </IconButton>
       </Toolbar>
