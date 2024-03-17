@@ -1,11 +1,12 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Box, IconButton, Toolbar } from "@mui/material";
-import { styled, useTheme } from '@mui/material/styles';
+import { Box, Button, CircularProgress, Fade, IconButton, Slide, Toolbar } from "@mui/material";
+import { styled } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
 import DefaultDrawer from "@/components/DefaultDrawer";
 import Dropzone from "@/components/Dropzone";
+import Results from "@/components/Results";
 import CustomSnackbar from "@/components/CustomSnackbar";
 import { useSnackbar } from "@/context/SnackbarContext";
 
@@ -13,6 +14,11 @@ const drawerWidth = 240
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open, viewportwidth }) => ({
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     flexGrow: 1,
     padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
@@ -30,6 +36,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     ...(viewportwidth < 768 && {
       marginLeft: 0,
     }),
+    overflow: 'hidden'
   }),
 )
 
@@ -50,23 +57,17 @@ const AppBar = styled(MuiAppBar, {
   }),
 }))
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
-}))
-
 export default function Home() {
   const { data: session, status } = useSession()
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
-  const theme = useTheme()
+  const mainRef = useRef(null)
   const email = session?.user?.email
   const [file, setFile] = useState(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [valid, setValid] = useState(true)
   const [viewportWidth, setViewportWidth] = useState(0)
+  const [submissionSuccess, setSubmissionSuccess] = useState(false)
+  const [results, setResults] = useState(null)
 
   useEffect(() => {
     setViewportWidth(window.innerWidth)
@@ -102,7 +103,7 @@ export default function Home() {
     }
   }, [email, openSnackbar]);
 
-  const handleDrawerOpen = () => {
+  const handleDrawer = () => {
     setDrawerOpen(!drawerOpen)
   }
 
@@ -111,7 +112,7 @@ export default function Home() {
       <AppBar>
         <Toolbar>
           <IconButton
-            onClick={handleDrawerOpen}
+            onClick={handleDrawer}
             color="inherit"
             edge="start"
             sx={{ mr: 2, ...(open && { display: 'none' }) }}
@@ -123,7 +124,7 @@ export default function Home() {
 
       <DefaultDrawer
         drawerOpen={drawerOpen}
-        handleDrawerOpen={handleDrawerOpen}
+        handleDrawer={handleDrawer}
         drawerWidth={drawerWidth}
         viewportWidth={viewportWidth}
         valid={valid}
@@ -132,14 +133,45 @@ export default function Home() {
       <Main
         open={drawerOpen}
         viewportwidth={viewportWidth}
+        ref={mainRef}
       >
-        <DrawerHeader />
-        <Dropzone
-          file={file}
-          setFile={setFile}
-          openSnackbar={openSnackbar}
-          valid={valid}
-        />
+        <Slide
+          in={!submissionSuccess}
+          out={!submissionSuccess}
+          container={mainRef.current}
+          direction="up"
+          mountOnEnter
+          unmountOnExit
+          easing={{
+            enter: 'cubic-bezier(0, 1.5, .8, 1)'
+          }}
+        >
+          <Dropzone
+            file={file}
+            setFile={setFile}
+            openSnackbar={openSnackbar}
+            valid={valid}
+            setSubmissionSuccess={setSubmissionSuccess}
+          />
+        </Slide>
+        {submissionSuccess && (
+          <Fade
+            in={submissionSuccess}
+            container={mainRef.current}
+            style={{
+              transitionDelay: '250ms'
+            }}
+          >
+            <CircularProgress />
+          </Fade>
+        )}
+        {/* <Slide
+          in={results !== null}
+          container={mainRef.current}
+          direction="left"
+        >
+          <Results />
+        </Slide> */}
       </Main>
 
       <CustomSnackbar
@@ -148,6 +180,11 @@ export default function Home() {
         message={message}
         severity={severity}
       />
+      <Button
+        onClick={() => setSubmissionSuccess(!submissionSuccess)}
+      >
+        Click
+      </Button>
     </Box >
   )
 }
