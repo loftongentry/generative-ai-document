@@ -1,9 +1,13 @@
-//TODO: For loading symbol, shows spinning loading logo on top of cloud, then once response is received, if succesful, show cloud with checkmark, if failed, show something with an x
-//TODO: On receiving succesful response from /api/getFileData, smoothly redirects to results (like a transition slide)
+//Process Flow
+/**
+ * 1. If user succesfully submits document slides to slide with spinning loading symbol (disable mouse and ability to click)
+ * 2. If GCP returns error, moves back to uploading page
+ * 3. If succesful, slides to results slide
+ * 4. On clear, slides back to submission pagey
+ */
 //TODO: Not receiving a response from api call
 //TODO: Drag and drop icon button does not inherit changes in color (error appearing) (Maybe change to button, and change the styling of the inner text)
-//TODO: Revoke data uri after submission
-import { useState, useCallback } from "react"
+import { useState, useCallback, forwardRef } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
 import { Box, Button, CircularProgress, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
@@ -17,8 +21,8 @@ import 'react-pdf/dist/Page/TextLayer.css';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 const maxSize = 1024 * 1024 * 5
 
-const Dropzone = (props) => {
-  const { file, setFile, openSnackbar, valid } = props
+const Dropzone = forwardRef((props, ref) => {
+  const { file, setFile, openSnackbar, valid, setSubmissionSuccess } = props
   const [loading, setLoading] = useState(false)
 
   const onDrop = useCallback(acceptedFiles => {
@@ -131,8 +135,9 @@ const Dropzone = (props) => {
         throw new Error(`${res.status} - ${res.statusText}`)
       }
 
+      setSubmissionSuccess(true)
       URL.revokeObjectURL(file.preview)
-      setFile('')
+      setFile(null)
     } catch (error) {
       console.error(`Error uploading document to google cloud: ${error}`)
       openSnackbar({ message: 'There was an error uploading your document, please try again later', severity: 'error' })
@@ -149,6 +154,7 @@ const Dropzone = (props) => {
         justifyContent: 'center',
         alignItems: 'center',
       }}
+      ref={ref}
     >
       <IconButton
         {...getRootProps({})}
@@ -243,6 +249,6 @@ const Dropzone = (props) => {
       </Fade>
     </Box>
   )
-}
+})
 
 export default Dropzone
