@@ -4,7 +4,7 @@
 //TODO: Button to click and copy data to clipboard in the respective components (doc text, doc summary)
 //TODO: If document is a PDF, then it's displayed as a PDF displayer
 //TODO: Stylizing each of the boxes below as well as the image displayed. (PNG/JPG/JPEG need to be smaller)
-//TODO: If just one page, show results for that one page, if multiple pages, show first page as cumulative results, than can filter down per page, etc.
+//TODO: If just one page, show results for that one page. Can switch between pages more easily
 import { forwardRef, useState } from "react"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, Stack, Typography, useTheme } from "@mui/material"
 import Image from "next/image"
