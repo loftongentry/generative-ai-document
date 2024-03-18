@@ -1,3 +1,4 @@
+//TODO: Websocket listening for responses from the cloud (open and close web socket based on submissionSuccess status?)
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Box, Button, CircularProgress, Fade, IconButton, Slide, Toolbar } from "@mui/material";
@@ -66,7 +67,7 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [valid, setValid] = useState(true)
   const [viewportWidth, setViewportWidth] = useState(0)
-  const [submissionSuccess, setSubmissionSuccess] = useState(false)
+  const [submissionSuccess, setSubmissionSuccess] = useState(true)
   const [results, setResults] = useState(null)
 
   useEffect(() => {
@@ -154,7 +155,8 @@ export default function Home() {
             setSubmissionSuccess={setSubmissionSuccess}
           />
         </Slide>
-        {submissionSuccess && (
+        {/* Temporarily commented out */}
+        {/* {submissionSuccess && (
           <Fade
             in={submissionSuccess}
             container={mainRef.current}
@@ -164,14 +166,18 @@ export default function Home() {
           >
             <CircularProgress />
           </Fade>
-        )}
-        {/* <Slide
+        )} */}
+        <Slide
           in={results !== null}
           container={mainRef.current}
           direction="left"
         >
-          <Results />
-        </Slide> */}
+          <Results 
+            results={results}
+            setResults={setResults}
+            viewportWidth={viewportWidth}
+          />
+        </Slide>
       </Main>
 
       <CustomSnackbar
