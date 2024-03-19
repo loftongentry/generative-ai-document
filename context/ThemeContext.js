@@ -1,92 +1,62 @@
-import { FormControl, MenuItem, Select, ThemeProvider, createTheme } from "@mui/material";
-import { createContext, useContext, useEffect, useState } from "react";
+import { CssBaseline, MenuItem, Select, ThemeProvider, createTheme, useMediaQuery } from "@mui/material";
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 
-const ThemeContext = createContext()
+const ThemeModeContext = createContext()
 
-const useThemeContext = () => useContext(ThemeContext)
+const useThemeContext = () => useContext(ThemeModeContext)
 
-export const ThemeModeProviderComponent = ({ children }) => {
-  const systemTheme = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+export const ThemeModeProvider = ({ children }) => {
+  //Check system preference for dark mode
+  const isDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [mode, setMode] = useState('light')
 
-  const [selectedTheme, setSelectedTheme] = useState(() =>
-    typeof localStorage !== 'undefined' && localStorage.getItem('theme') || 'system'
-  )
+  //Check local storage for theme preference on initial load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setMode(window.localStorage.getItem('theme') || 'light')
+    }
+  }, [])
 
-  const themes = {
-    light: createTheme({
+  //Toggle theme mode function
+  const toggleThemeMode = (event) => {
+    const newMode = event.target.value
+    window.localStorage.setItem('theme', newMode)
+    setMode(newMode)
+  }
+
+  //Create theme based on color mode state
+  const theme = useMemo(() => (
+    createTheme({
       palette: {
-        mode: 'light',
-        primary: {
-          main: '#0065bd'
-        },
-        secondary: {
-          main: '#00b6d3'
-        }
-      }
-    }),
-    dark: createTheme({
-      palette: {
-        mode: 'dark',
-        primary: {
-          main: '#0065bd'
-        },
-        secondary: {
-          main: '#00b6d3'
-        }
-      }
-    }),
-    system: createTheme({
-      palette: {
-        mode: systemTheme,
-        primary: {
-          main: '#0065bd'
-        },
-        secondary: {
-          main: '#00b6d3'
-        }
+        mode: mode === 'dark' || (mode === 'auto' && isDarkMode) ? 'dark' : 'light'
       }
     })
-  }
+  ), [mode, isDarkMode])
 
-  useEffect(() => {
-    if (selectedTheme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      themes.system.palette.mode = systemTheme
-    }
-  }, [selectedTheme, themes.system])
-
-  const handleThemeChange = (event) => {
-    const { value } = event.target
-
-    setSelectedTheme(value)
-    localStorage.setItem('theme', value)
-  }
+  //Value for the ThemeModeContext.Provider
+  const themeModeValue = useMemo(() => ({ mode, toggleThemeMode }), [mode, toggleThemeMode])
 
   return (
-    <ThemeContext.Provider value={{ selectedTheme, handleThemeChange }}>
-      <ThemeProvider theme={themes[selectedTheme]}>
-          {children}
+    <ThemeModeContext.Provider value={themeModeValue}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
       </ThemeProvider>
-    </ThemeContext.Provider>
+    </ThemeModeContext.Provider>
   )
 }
 
 export const ThemeSelector = () => {
-  const { selectedTheme, handleThemeChange } = useThemeContext()
-
-  if (typeof window === 'undefined') return null
+  const { mode, toggleThemeMode } = useThemeContext()
 
   return (
-    <FormControl>
-      <Select
-        value={selectedTheme}
-        onChange={handleThemeChange}
-        size="small"
-      >
-        <MenuItem value='system'>System</MenuItem>
-        <MenuItem value='dark'>Dark</MenuItem>
-        <MenuItem value='light'>Light</MenuItem>
-      </Select>
-    </FormControl>
+    <Select
+      value={mode}
+      onChange={(e) => toggleThemeMode(e)}
+      size='small'
+    >
+      <MenuItem value='dark'>Dark</MenuItem>
+      <MenuItem value='light'>Light</MenuItem>
+    </Select>
   )
 }
