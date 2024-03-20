@@ -6,11 +6,19 @@
 //TODO: Stylizing each of the boxes below as well as the image displayed. (PNG/JPG/JPEG need to be smaller)
 //TODO: If just one page, show results for that one page. Can switch between pages more easily
 import { forwardRef, useState } from "react"
-import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, Stack, Typography, useTheme } from "@mui/material"
+import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, Paper, Stack, Typography, styled, useTheme } from "@mui/material"
 import Image from "next/image"
 import { TestResult } from '../test/TestResult'
 import { languageMap } from "@/languageMap"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundCOlo: theme.palette.mode === 'dark' ? '#1a2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  //textAlign: 'center',
+  color: theme.palette.text.secondary
+}))
 
 const Results = forwardRef((props, ref) => {
   const { results, setResults, viewportWidth } = props
@@ -41,139 +49,155 @@ const Results = forwardRef((props, ref) => {
     //ref={ref}
     >
       <Box>
-        <Image
-          src={TestResult.doc_analysis.doc_image}
-          alt='Analyzed Document'
-        />
+        <Item>
+          <Image
+            src={TestResult.doc_analysis.doc_image}
+            alt='Analyzed Document'
+          />
+        </Item>
       </Box>
       <Divider />
+      {/* Slightly shifted over, need to fix that */}
       <Grid
         container
         spacing={1}
+        sx={{ flexGrow: 1 }}
       >
-        <Grid item xs={4}>
-          {TestResult.doc_analysis.doc_text}
+        <Grid
+          item
+          xs={4}
+        >
+          <Item>
+            {TestResult.doc_analysis.doc_text}
+          </Item>
+        </Grid>
+        <Grid
+          item
+          xs={4}
+        >
+          <Item>
+            {TestResult.doc_analysis.doc_summary}
+          </Item>
         </Grid>
         <Grid item xs={4}>
-          {TestResult.doc_analysis.doc_summary}
-        </Grid>
-        <Grid item xs={4}>
-          <Stack
-            spacing={1}
-          >
-            {TestResult.doc_analysis.pages.map((page, pageIndex) => (
-              <Stack
-                spacing={1}
-                key={`${page}-${pageIndex}`}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <Typography>
-                    Image Quality Score
-                  </Typography>
-                  <Typography>
-                    {`${sliderValues[pageIndex].qualityScore}%`}
-                  </Typography>
-                </Box>
-                <Divider />
-                <Accordion
-                  expanded={expanded === `panel${pageIndex}`}
-                  onChange={handleExpandChange(`panel${pageIndex}`)}                  
-                  sx={{
-                    maxHeight: '200px',
-                    overflowY: 'scroll',
-                    '&::-webkit-scrollbar': {
-                      width: '5px',
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                      borderRadius: '8px',
-                      minHeight: '24px',
-                      backgroundColor: 'transparent'
-                    },
-                    '&:hover::-webkit-scrollbar-thumb': {
-                      backgroundColor: '#b7b7b7'
-                    }
-                  }}
-                >
-                  <AccordionSummary
-                    expandIcon={<ArrowDropDownIcon />}
-                  >
-                    <Typography>
-                      Detected Languages
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    {page.detected_languages.map((lang, langIndex) => (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                        }}
-                        key={`${lang}-${langIndex}`}
-                      >
-                        <Typography>
-                          {getLangName(lang.languageCode)}
-                        </Typography>
-                        <Typography>
-                          {`${sliderValues[pageIndex].detectedLanguages[langIndex]}%`}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </AccordionDetails>
-                </Accordion>
-              </Stack>
-            ))}
-            <Divider />
-            <Accordion
-              expanded={expanded === 'wordPrevalence'}
-              onChange={handleExpandChange('wordPrevalence')}
-              sx={{
-                maxHeight: '200px',
-                overflowY: 'scroll',
-                '&::-webkit-scrollbar': {
-                  width: '5px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  borderRadius: '8px',
-                  minHeight: '24px',
-                  backgroundColor: 'transparent'
-                },
-                '&:hover::-webkit-scrollbar-thumb': {
-                  backgroundColor: '#b7b7b7'
-                }
-              }}
+          <Item>
+            <Stack
+              spacing={1}
             >
-              <AccordionSummary
-                expandIcon={<ArrowDropDownIcon />}
-              >
-                <Typography>
-                  Word Prevalence
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                {Object.entries(TestResult.doc_analysis.word_counts).map(([key, value]) => (
+              {TestResult.doc_analysis.pages.map((page, pageIndex) => (
+                <Stack
+                  spacing={1}
+                  key={`${page}-${pageIndex}`}
+                >
                   <Box
                     sx={{
                       display: 'flex',
                       justifyContent: 'space-between'
                     }}
-                    key={`word-count-${key}`}
                   >
                     <Typography>
-                      {key}
+                      Image Quality Score
                     </Typography>
                     <Typography>
-                      {value}
+                      {`${sliderValues[pageIndex].qualityScore}%`}
                     </Typography>
                   </Box>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-          </Stack>
+                  <Divider />
+                  <Accordion
+                    expanded={expanded === `panel${pageIndex}`}
+                    onChange={handleExpandChange(`panel${pageIndex}`)}
+                    sx={{
+                      maxHeight: '200px',
+                      overflowY: 'scroll',
+                      '&::-webkit-scrollbar': {
+                        width: '5px',
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        borderRadius: '8px',
+                        minHeight: '24px',
+                        backgroundColor: 'transparent'
+                      },
+                      '&:hover::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#b7b7b7'
+                      }
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ArrowDropDownIcon />}
+                    >
+                      <Typography>
+                        Detected Languages
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {page.detected_languages.map((lang, langIndex) => (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                          key={`${lang}-${langIndex}`}
+                        >
+                          <Typography>
+                            {getLangName(lang.languageCode)}
+                          </Typography>
+                          <Typography>
+                            {`${sliderValues[pageIndex].detectedLanguages[langIndex]}%`}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </AccordionDetails>
+                  </Accordion>
+                </Stack>
+              ))}
+              <Divider />
+              <Accordion
+                expanded={expanded === 'wordPrevalence'}
+                onChange={handleExpandChange('wordPrevalence')}
+                sx={{
+                  maxHeight: '200px',
+                  overflowY: 'scroll',
+                  '&::-webkit-scrollbar': {
+                    width: '5px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    borderRadius: '8px',
+                    minHeight: '24px',
+                    backgroundColor: 'transparent'
+                  },
+                  '&:hover::-webkit-scrollbar-thumb': {
+                    backgroundColor: '#b7b7b7'
+                  }
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ArrowDropDownIcon />}
+                >
+                  <Typography>
+                    Word Prevalence
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {Object.entries(TestResult.doc_analysis.word_counts).map(([key, value]) => (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                      }}
+                      key={`word-count-${key}`}
+                    >
+                      <Typography>
+                        {key}
+                      </Typography>
+                      <Typography>
+                        {value}
+                      </Typography>
+                    </Box>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+            </Stack>
+          </Item>
         </Grid>
       </Grid>
     </Stack>
