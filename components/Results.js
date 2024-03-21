@@ -1,10 +1,9 @@
-//TODO: This is where the results will appears after being returned from the 'getData' api route
+//NOTE: This is where the results will appears after being returned from the 'getData' api route
 //TODO: Tooltips explaining what each of the items is
 //TODO: Clicking on the block with the doc text or the doc summary, opens a modal (or something) so it's easier to read for end user to digest
 //TODO: Button to click and copy data to clipboard in the respective components (doc text, doc summary)
 //TODO: If document is a PDF, then it's displayed as a PDF displayer
 //TODO: Stylizing each of the boxes below as well as the image displayed. (PNG/JPG/JPEG need to be smaller)
-//TODO: If just one page, show results for that one page. Can switch between pages more easily
 import { forwardRef, useState } from "react"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, Paper, Stack, Typography, styled, useTheme } from "@mui/material"
 import Image from "next/image"
@@ -22,7 +21,6 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const Results = forwardRef((props, ref) => {
   const { results, setResults, viewportWidth } = props
-  const theme = useTheme()
   const [sliderValues, setSliderValues] = useState(
     TestResult.doc_analysis.pages.map(page => ({
       qualityScore: page.quality_score * 100,
