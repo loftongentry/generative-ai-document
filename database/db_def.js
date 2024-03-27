@@ -42,11 +42,8 @@ console.log('Connection through sequelize established')
 
 const closeSequelize = async () => {
   try {
-    if (sequelizeInstance) {
-      await sequelizeInstance.close()
-      console.log('Sequelize connection closed succesfully')
-      sequelizeInstance = null
-    }
+    await sequelize.close()
+    console.log('Sequelize connection closed succesfully')
   } catch (error) {
     console.error(`Error closing sequelize connection: ${error}`)
   }
