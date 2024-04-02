@@ -1,21 +1,20 @@
 //NOTE: This is where the results will appears after being returned from the 'getData' api route
 //TODO: Tooltips explaining what each of the items is
 //TODO: Clicking on the block with the doc text or the doc summary, opens a modal (or something) so it's easier to read for end user to digest
-//TODO: Button to click and copy data to clipboard in the respective components (doc text, doc summary)
-//TODO: If document is a PDF, then it's displayed as a PDF displayer
-//TODO: Stylizing each of the boxes below as well as the image displayed. (PNG/JPG/JPEG need to be smaller)
+//TODO: Button to click and copy data to clipboard in the
+//TODO: Stylizing each of the boxes below as well as the image display respective components (doc text, doc summary)
+//TODO: If document is a PDF, then it's displayed as a PDF displayered. (PNG/JPG/JPEG need to be smaller)
 import { forwardRef, useState } from "react"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, Paper, Stack, Typography, styled, useTheme } from "@mui/material"
 import Image from "next/image"
-import { TestResult } from '../test/TestResult'
 import { languageMap } from "@/languageMap"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { TestResult } from '../test/TestResult'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundCOlo: theme.palette.mode === 'dark' ? '#1a2027' : '#fff',
   ...theme.typography.body2,
   padding: theme.spacing(1),
-  //textAlign: 'center',
   color: theme.palette.text.secondary
 }))
 
@@ -44,7 +43,7 @@ const Results = forwardRef((props, ref) => {
   return (
     <Stack
       spacing={1}
-    //ref={ref}
+      ref={ref}
     >
       <Box>
         <Item>
