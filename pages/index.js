@@ -1,4 +1,5 @@
-//TODO: Websocket listening for responses from the cloud (open and close web socket based on submissionSuccess status?)
+//TODO: Handling use SSE
+//TODO: Use "getServerSideProps" when fetching data post authorization from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Box, Button, CircularProgress, Fade, IconButton, Slide, Toolbar } from "@mui/material";
@@ -67,7 +68,7 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [valid, setValid] = useState(true)
   const [viewportWidth, setViewportWidth] = useState(0)
-  const [submissionSuccess, setSubmissionSuccess] = useState(true)
+  const [submissionSuccess, setSubmissionSuccess] = useState(false)
   const [results, setResults] = useState(null)
 
   useEffect(() => {
@@ -83,26 +84,55 @@ export default function Home() {
     }
   }, [status])
 
+  useEffect(() => {
+    const eventSource = connectToStream()
+
+    return () => {
+      eventSource.close()
+    }
+  }, [])
+
   const validateUser = useCallback(async () => {
     try {
       const res = await fetch(`/api/auth/validate/${email}`, {
         method: 'GET',
-      });
+      })
 
       if (!res.ok) {
-        throw new Error(`${res.status} - ${res.statusText}`);
+        throw new Error(`${res.status} - ${res.statusText}`)
       }
 
-      const response = await res.json();
-      const uuid = response.uuid;
+      const response = await res.json()
+      const uuid = response.uuid
 
-      localStorage.setItem('uuid', uuid);
-      setValid(true);
+      localStorage.setItem('uuid', uuid)
+      setValid(true)
     } catch (error) {
-      console.error(`Error occurred when logging in user: ${error}`);
-      openSnackbar({ message: 'Error signing in user', severity: 'error' });
+      console.error(`Error occurred when logging in user: ${error}`)
+      openSnackbar({ message: 'Error signing in user', severity: 'error' })
     }
-  }, [email, openSnackbar]);
+  }, [email])
+
+  const connectToStream = () => {
+    const eventSource = new EventSource('/api/getFileData')
+
+    eventSource.addEventListener('message', (event) => {
+      const data = JSON.parse(event.data)
+      console.log(data)
+    })
+
+    eventSource.addEventListener('error', () => {
+      eventSource.close()
+      openSnackbar({ message: 'Unable to retrieve analysis results, please try again alter', severity: 'error' })
+      setTimeout(connectToStream, 1)
+    })
+
+    eventSource.onClose = () => {
+      setTimeout(connectToStream, 1)
+    }
+
+    return eventSource
+  }
 
   const handleDrawer = () => {
     setDrawerOpen(!drawerOpen)
@@ -167,17 +197,17 @@ export default function Home() {
             <CircularProgress />
           </Fade>
         )} */}
-        <Slide
+        {/* <Slide
           in={results !== null}
           container={mainRef.current}
           direction="left"
         >
-          <Results 
+          <Results
             results={results}
             setResults={setResults}
             viewportWidth={viewportWidth}
           />
-        </Slide>
+        </Slide> */}
       </Main>
 
       <CustomSnackbar
