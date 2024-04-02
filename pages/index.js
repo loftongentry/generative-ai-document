@@ -85,12 +85,29 @@ export default function Home() {
   }, [status])
 
   useEffect(() => {
-    const eventSource = connectToStream()
+    const eventSource = new EventSource('/api/getFileData')
 
-    return () => {
+    if (!submissionSuccess) {
+      eventSource.close()
+      return
+    }
+
+    eventSource.onmessage('message', (event) => {
+      const newData = JSON.parse(event.data)
+      console.log(newData)
+    })
+
+    eventSource.onerror = (event) => {
+      console.log(`Error retrieving results: ${error}`)
+      openSnackbar({ message: 'There was an error retrieving your results, please try again later', severity: 'error' })
       eventSource.close()
     }
-  }, [])
+
+    return () => {
+      setSubmissionSuccess(false)
+      eventSource.close()
+    }
+  }, [submissionSuccess])
 
   const validateUser = useCallback(async () => {
     try {
@@ -112,27 +129,6 @@ export default function Home() {
       openSnackbar({ message: 'Error signing in user', severity: 'error' })
     }
   }, [email])
-
-  const connectToStream = () => {
-    const eventSource = new EventSource('/api/getFileData')
-
-    eventSource.addEventListener('message', (event) => {
-      const data = JSON.parse(event.data)
-      console.log(data)
-    })
-
-    eventSource.addEventListener('error', () => {
-      eventSource.close()
-      openSnackbar({ message: 'Unable to retrieve analysis results, please try again alter', severity: 'error' })
-      setTimeout(connectToStream, 1)
-    })
-
-    eventSource.onClose = () => {
-      setTimeout(connectToStream, 1)
-    }
-
-    return eventSource
-  }
 
   const handleDrawer = () => {
     setDrawerOpen(!drawerOpen)
