@@ -1,5 +1,6 @@
 //TODO: Handling use SSE
 //TODO: Use "getServerSideProps" when fetching data post authorization from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
+//TODO: Instead of having there be two states, have the spinning logo appear over top the dropzone, and then it slides out and slides in the results. So only two slides to show
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Box, Button, CircularProgress, Fade, IconButton, Slide, Toolbar } from "@mui/material";
@@ -11,6 +12,7 @@ import Dropzone from "@/components/Dropzone";
 import Results from "@/components/Results";
 import CustomSnackbar from "@/components/CustomSnackbar";
 import { useSnackbar } from "@/context/SnackbarContext";
+import { TestResult } from "@/test/TestResult";
 
 const drawerWidth = 240
 
@@ -80,34 +82,34 @@ export default function Home() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      validateUser()
+      //validateUser()
     }
   }, [status])
 
-  useEffect(() => {
-    const eventSource = new EventSource('/api/getFileData')
+  // useEffect(() => {
+  //   const eventSource = new EventSource('/api/getFileData')
 
-    if (!submissionSuccess) {
-      eventSource.close()
-      return
-    }
+  //   if (!submissionSuccess) {
+  //     eventSource.close()
+  //     return
+  //   }
 
-    eventSource.onmessage('message', (event) => {
-      const newData = JSON.parse(event.data)
-      console.log(newData)
-    })
+  //   eventSource.onmessage('message', (event) => {
+  //     const newData = JSON.parse(event.data)
+  //     console.log(newData)
+  //   })
 
-    eventSource.onerror = (event) => {
-      console.log(`Error retrieving results: ${error}`)
-      openSnackbar({ message: 'There was an error retrieving your results, please try again later', severity: 'error' })
-      eventSource.close()
-    }
+  //   eventSource.onerror = (event) => {
+  //     console.log(`Error retrieving results: ${error}`)
+  //     openSnackbar({ message: 'There was an error retrieving your results, please try again later', severity: 'error' })
+  //     eventSource.close()
+  //   }
 
-    return () => {
-      setSubmissionSuccess(false)
-      eventSource.close()
-    }
-  }, [submissionSuccess])
+  //   return () => {
+  //     setSubmissionSuccess(false)
+  //     eventSource.close()
+  //   }
+  // }, [submissionSuccess])
 
   const validateUser = useCallback(async () => {
     try {
@@ -134,10 +136,19 @@ export default function Home() {
     setDrawerOpen(!drawerOpen)
   }
 
+  const handleSetResults = () => {
+    setResults((prevResults) => prevResults === null ? TestResult : null);
+  }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar>
-        <Toolbar>
+        <Toolbar
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+        >
           <IconButton
             onClick={handleDrawer}
             color="inherit"
@@ -146,6 +157,27 @@ export default function Home() {
           >
             <MenuIcon />
           </IconButton>
+          {process.env.NODE_ENV === 'development' && (
+            <Box
+              sx={{
+                display: 'flex',
+                gap: '10px'
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={() => setSubmissionSuccess(!submissionSuccess)}
+              >
+                Change Sub-Succ State
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleSetResults}
+              >
+                Change Results State
+              </Button>
+            </Box>
+          )}
         </Toolbar>
       </AppBar>
 
@@ -164,13 +196,13 @@ export default function Home() {
       >
         <Slide
           in={!submissionSuccess}
-          out={!submissionSuccess}
           container={mainRef.current}
           direction="up"
           mountOnEnter
           unmountOnExit
+          timeout={{enter: 250, exit: 250}}
           easing={{
-            enter: 'cubic-bezier(0, 1.5, .8, 1)'
+            enter: 'cubic-bezier(0, 1.5, .8, 1)',
           }}
         >
           <Dropzone
@@ -181,29 +213,35 @@ export default function Home() {
             setSubmissionSuccess={setSubmissionSuccess}
           />
         </Slide>
-        {/* Temporarily commented out */}
-        {/* {submissionSuccess && (
-          <Fade
-            in={submissionSuccess}
-            container={mainRef.current}
-            style={{
-              transitionDelay: '250ms'
-            }}
-          >
-            <CircularProgress />
-          </Fade>
-        )} */}
-        {/* <Slide
-          in={results !== null}
+        <Fade
+          in={submissionSuccess}
+          out={`${results !== null}`}
+          mountOnEnter
+          unmountOnExit
           container={mainRef.current}
-          direction="left"
+          timeout={{ enter: 500, exit: 0 }}
+          style={{
+            transitionDelay: '300ms'
+          }}
+        >
+          <CircularProgress />
+        </Fade>
+        <Fade
+          in={results !== null}
+          mountOnEnter
+          unmountOnExit
+          container={mainRef.current}
+          timeout={{ enter: 500, exit: 0 }}
+          style={{
+            transitionDelay: '300ms'
+          }}
         >
           <Results
             results={results}
             setResults={setResults}
             viewportWidth={viewportWidth}
           />
-        </Slide> */}
+        </Fade>
       </Main>
 
       <CustomSnackbar
@@ -212,11 +250,6 @@ export default function Home() {
         message={message}
         severity={severity}
       />
-      <Button
-        onClick={() => setSubmissionSuccess(!submissionSuccess)}
-      >
-        Click
-      </Button>
     </Box >
   )
 }
