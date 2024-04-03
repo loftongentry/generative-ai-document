@@ -3,16 +3,15 @@
 //TODO: Clicking on the block with the doc text or the doc summary, opens a modal (or something) so it's easier to read for end user to digest
 //TODO: Button to click and copy data to clipboard in the
 //TODO: Stylizing each of the boxes below as well as the image display respective components (doc text, doc summary)
-//TODO: If document is a PDF, then it's displayed as a PDF displayered. (PNG/JPG/JPEG need to be smaller)
+//TODO: If document is a PDF, then it's displayed as a PDF displayer. (PNG/JPG/JPEG need to be smaller)
 import { forwardRef, useState } from "react"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, Paper, Stack, Typography, styled, useTheme } from "@mui/material"
 import Image from "next/image"
 import { languageMap } from "@/languageMap"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { TestResult } from '../test/TestResult'
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundCOlo: theme.palette.mode === 'dark' ? '#1a2027' : '#fff',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1a2027' : '#fff',
   ...theme.typography.body2,
   padding: theme.spacing(1),
   color: theme.palette.text.secondary
@@ -20,13 +19,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const Results = forwardRef((props, ref) => {
   const { results, setResults, viewportWidth } = props
-  const [sliderValues, setSliderValues] = useState(
-    TestResult.doc_analysis.pages.map(page => ({
-      qualityScore: page.quality_score * 100,
-      detectedLanguages: page.detected_languages.map(lang => parseFloat((lang.confidence * 100).toFixed(2)))
-    }))
-  )
-  const [expanded, setExpanded] = useState(null)
+  const [langExapanded, setLangExpanded] = useState(false)
+  const [wordCountExapnded, setWordCountExpanded] = useState(false)
 
   const getLangName = (langCode) => {
     if (languageMap.hasOwnProperty(langCode)) {
@@ -36,8 +30,15 @@ const Results = forwardRef((props, ref) => {
     }
   }
 
-  const handleExpandChange = (panel) => (event, newExpanded) => {
-    setExpanded(newExpanded ? panel : false)
+  const handleExpandChange = (accordion) => {
+    if (accordion === 'lang') {
+      setLangExpanded((prev) => !prev)
+      setWordCountExpanded(false)
+    }
+    if (accordion === 'wordCount') {
+      setLangExpanded(false)
+      setWordCountExpanded((prev) => !prev)
+    }
   }
 
   return (
@@ -48,7 +49,7 @@ const Results = forwardRef((props, ref) => {
       <Box>
         <Item>
           <Image
-            src={TestResult.doc_analysis.doc_image}
+            src={results?.doc_image || ''}
             alt='Analyzed Document'
           />
         </Item>
@@ -65,7 +66,7 @@ const Results = forwardRef((props, ref) => {
           xs={4}
         >
           <Item>
-            {TestResult.doc_analysis.doc_text}
+            {results?.doc_text}
           </Item>
         </Grid>
         <Grid
@@ -73,7 +74,7 @@ const Results = forwardRef((props, ref) => {
           xs={4}
         >
           <Item>
-            {TestResult.doc_analysis.doc_summary}
+            {results?.doc_summary}
           </Item>
         </Grid>
         <Grid item xs={4}>
@@ -81,76 +82,69 @@ const Results = forwardRef((props, ref) => {
             <Stack
               spacing={1}
             >
-              {TestResult.doc_analysis.pages.map((page, pageIndex) => (
-                <Stack
-                  spacing={1}
-                  key={`${page}-${pageIndex}`}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between'
-                    }}
-                  >
-                    <Typography>
-                      Image Quality Score
-                    </Typography>
-                    <Typography>
-                      {`${sliderValues[pageIndex].qualityScore}%`}
-                    </Typography>
-                  </Box>
-                  <Divider />
-                  <Accordion
-                    expanded={expanded === `panel${pageIndex}`}
-                    onChange={handleExpandChange(`panel${pageIndex}`)}
-                    sx={{
-                      maxHeight: '200px',
-                      overflowY: 'scroll',
-                      '&::-webkit-scrollbar': {
-                        width: '5px',
-                      },
-                      '&::-webkit-scrollbar-thumb': {
-                        borderRadius: '8px',
-                        minHeight: '24px',
-                        backgroundColor: 'transparent'
-                      },
-                      '&:hover::-webkit-scrollbar-thumb': {
-                        backgroundColor: '#b7b7b7'
-                      }
-                    }}
-                  >
-                    <AccordionSummary
-                      expandIcon={<ArrowDropDownIcon />}
-                    >
-                      <Typography>
-                        Detected Languages
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {page.detected_languages.map((lang, langIndex) => (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                          key={`${lang}-${langIndex}`}
-                        >
-                          <Typography>
-                            {getLangName(lang.languageCode)}
-                          </Typography>
-                          <Typography>
-                            {`${sliderValues[pageIndex].detectedLanguages[langIndex]}%`}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                </Stack>
-              ))}
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <Typography>
+                  Image Quality Score
+                </Typography>
+                <Typography>
+                  {`${results?.quality_score}%`}
+                </Typography>
+              </Box>
               <Divider />
               <Accordion
-                expanded={expanded === 'wordPrevalence'}
-                onChange={handleExpandChange('wordPrevalence')}
+                expanded={langExapanded}
+                onChange={() => handleExpandChange('lang')}
+                sx={{
+                  maxHeight: '200px',
+                  overflowY: 'scroll',
+                  '&::-webkit-scrollbar': {
+                    width: '5px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    borderRadius: '8px',
+                    minHeight: '24px',
+                    backgroundColor: 'transparent'
+                  },
+                  '&:hover::-webkit-scrollbar-thumb': {
+                    backgroundColor: '#b7b7b7'
+                  }
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ArrowDropDownIcon />}
+                >
+                  <Typography>
+                    Detected Languages
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {results?.detected_languages.map((lang) => (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                      key={`${lang.languageCode}`}
+                    >
+                      <Typography>
+                        {getLangName(lang.languageCode)}
+                      </Typography>
+                      <Typography>
+                        {`${lang.confidence}%`}
+                      </Typography>
+                    </Box>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+              <Divider />
+              <Accordion
+                expanded={wordCountExapnded}
+                onChange={() => handleExpandChange('wordCount')}
                 sx={{
                   maxHeight: '200px',
                   overflowY: 'scroll',
@@ -175,7 +169,7 @@ const Results = forwardRef((props, ref) => {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  {Object.entries(TestResult.doc_analysis.word_counts).map(([key, value]) => (
+                  {results && Object.entries(results?.word_counts).map(([key, value]) => (
                     <Box
                       sx={{
                         display: 'flex',
