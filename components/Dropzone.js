@@ -187,8 +187,7 @@ const Dropzone = forwardRef((props, ref) => {
         </Box>
       </IconButton>
 
-      {/* Error here with the 'out' prop */}
-      <Fade in={file !== null} out={file === null}>
+      <Fade in={file !== null} out={`${file === null}`}>
         <List>
           <ListItem
             key={file?.name}
