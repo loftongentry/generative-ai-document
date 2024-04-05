@@ -5,7 +5,7 @@
  * 3. If succesful, slides to results slide
  * 4. On clear, slides back to submission pagey
  */
-//TODO: Not receiving a response from api call
+//TODO: Not receiving a response from API
 import { useCallback, forwardRef } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
@@ -21,7 +21,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const maxSize = 1024 * 1024 * 5
 
 const Dropzone = forwardRef((props, ref) => {
-  const { file, setFile, openSnackbar, valid, loading, setLoading } = props
+  const { file, setFile, openSnackbar, valid, loading, setLoading, viewportwidth } = props
 
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles?.length) {
@@ -133,15 +133,13 @@ const Dropzone = forwardRef((props, ref) => {
         throw new Error(`${res.status} - ${res.statusText}`)
       }
 
-      setSubmissionSuccess(true)
       URL.revokeObjectURL(file.preview)
       setFile(null)
     } catch (error) {
       console.error(`Error uploading document to google cloud: ${error}`)
       openSnackbar({ message: 'There was an error uploading your document, please try again later', severity: 'error' })
-    } finally {
       setLoading(false)
-    }
+    } 
   }
 
   return (
@@ -163,7 +161,7 @@ const Dropzone = forwardRef((props, ref) => {
           borderRadius: '5px',
           padding: '20px',
           width: '425px',
-          height: '175px'
+          height: '175px',
         }}
         disabled={!valid || file !== null}
       >
