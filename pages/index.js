@@ -184,7 +184,7 @@ export default function Home() {
               </Box>
             )}
             <Fade
-              in={results}
+              in={results !== null}
             >
               <Button
                 variant="contained"
@@ -212,7 +212,7 @@ export default function Home() {
       >
         <Slide
           in={!results}
-          out={results}
+          out={`${results}`}
           container={mainRef.current}
           direction="up"
           mountOnEnter
@@ -229,11 +229,11 @@ export default function Home() {
             valid={valid}
             loading={loading}
             setLoading={setLoading}
+            viewportwidth={viewportWidth}
           />
         </Slide>
         <Fade
-          in={results}
-          out={!results}
+          in={results !== null}
           container={mainRef.current}
           mountOnEnter
           unmountOnExit
@@ -246,8 +246,8 @@ export default function Home() {
         >
           <Results
             results={results}
-            setResults={setResults}
-            viewportWidth={viewportWidth}
+            viewportwidth={viewportWidth}
+            openSnackbar={openSnackbar}
           />
         </Fade>
       </Main>
