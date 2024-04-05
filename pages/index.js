@@ -1,6 +1,5 @@
 //TODO: Handling use SSE
 //TODO: Use "getServerSideProps" when fetching data post authorization from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
-//TODO: Instead of having there be two states, have the spinning logo appear over top the dropzone, and then it slides out and slides in the results. So only two slides to show
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Box, Button, Fade, IconButton, Slide, Toolbar } from "@mui/material";
@@ -221,6 +220,7 @@ export default function Home() {
           easing={{
             enter: 'cubic-bezier(0, 1.5, .8, 1)',
           }}
+          style={{ position: 'relative' }}
         >
           <Dropzone
             file={file}
@@ -237,9 +237,11 @@ export default function Home() {
           container={mainRef.current}
           mountOnEnter
           unmountOnExit
-          timeout={{ enter: 500, exit: 0 }}
+          timeout={{ enter: 300, exit: 0 }}
           style={{
-            transitionDelay: '250ms'
+            transitionDelay: '250ms',
+            position: 'absolute',
+            zIndex: 1
           }}
         >
           <Results
