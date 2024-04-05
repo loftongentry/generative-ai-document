@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.11.0",
     "@google-cloud/storage": "^7.7.0",
     "@mui/icons-material": "^5.15.11",
-    "@mui/material": "^5.15.10",
+    "@mui/material": "^5.15.15",
     "dotenv": "^16.4.3",
     "formidable": "^3.5.1",
     "googleapis": "^133.0.0",
