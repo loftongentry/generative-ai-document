@@ -5,20 +5,51 @@
 //TODO: Stylizing each of the boxes below as well as the image display respective components (doc text, doc summary)
 //TODO: If document is a PDF, then it's displayed as a PDF displayer. (PNG/JPG/JPEG need to be smaller)
 import { forwardRef, useState } from "react"
-import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, Paper, Stack, Typography, styled, useTheme } from "@mui/material"
+import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, IconButton, Paper, Stack, Typography, Toolbar, styled } from "@mui/material"
 import Image from "next/image"
 import { languageMap } from "@/languageMap"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
+const CustomToolbar = ({ toolbarName }) => {
+  
+  const copyToClipboard = () => {
+    openSnackbar({ message: 'Copied to clipboard', severity: 'success' })
+    navigator.clipboard.writeText()
+  }
+
+  return (
+    <Toolbar
+      disableGutters
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        '&.MuiToolbar-root': {
+          minHeight: '0px'
+        }
+      }}
+    >
+      <Typography>
+        {toolbarName}
+      </Typography>
+      <IconButton>
+        <ContentCopyIcon />
+      </IconButton>
+    </Toolbar>
+  )
+}
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1a2027' : '#fff',
   ...theme.typography.body2,
   padding: theme.spacing(1),
-  color: theme.palette.text.secondary
+  color: theme.palette.text.secondary,
+  margin: '5px',
+  padding: '10px'
 }))
 
 const Results = forwardRef((props, ref) => {
-  const { results, setResults, viewportWidth } = props
+  const { results, viewportwidth, openSnackbar } = props
   const [langExapanded, setLangExpanded] = useState(false)
   const [wordCountExapnded, setWordCountExpanded] = useState(false)
 
@@ -41,6 +72,10 @@ const Results = forwardRef((props, ref) => {
     }
   }
 
+  const getValue = (value) => {
+    return (value * 100).toFixed(2)
+  }
+
   return (
     <div
       ref={ref}
@@ -58,29 +93,36 @@ const Results = forwardRef((props, ref) => {
           </Item>
         </Box>
         <Divider />
-        {/* Slightly shifted over, need to fix that */}
         <Grid
           container
-          spacing={1}
           sx={{ flexGrow: 1 }}
         >
           <Grid
             item
-            xs={4}
+            xs={viewportwidth <= 425 ? 12 : 4}
           >
             <Item>
+              <CustomToolbar
+                toolbarName={'Analyzed Text'}
+              />
               {results?.doc_text}
             </Item>
           </Grid>
           <Grid
             item
-            xs={4}
+            xs={viewportwidth <= 425 ? 12 : 4}
           >
             <Item>
+              <CustomToolbar
+                toolbarName={'Document Summary'}
+              />
               {results?.doc_summary}
             </Item>
           </Grid>
-          <Grid item xs={4}>
+          <Grid
+            item
+            xs={viewportwidth <= 425 ? 12 : 4}
+          >
             <Item>
               <Stack
                 spacing={1}
@@ -95,7 +137,7 @@ const Results = forwardRef((props, ref) => {
                     Image Quality Score
                   </Typography>
                   <Typography>
-                    {`${results?.quality_score}%`}
+                    {`${getValue(results?.quality_score)}%`}
                   </Typography>
                 </Box>
                 <Divider />
@@ -138,7 +180,7 @@ const Results = forwardRef((props, ref) => {
                           {getLangName(lang.languageCode)}
                         </Typography>
                         <Typography>
-                          {`${lang.confidence}%`}
+                          {`${getValue(lang.confidence)}%`}
                         </Typography>
                       </Box>
                     ))}
