@@ -6,8 +6,7 @@
  * 4. On clear, slides back to submission pagey
  */
 //TODO: Not receiving a response from api call
-//TODO: Drag and drop icon button does not inherit changes in color (error appearing) (Maybe change to button, and change the styling of the inner text)
-import { useState, useCallback, forwardRef } from "react"
+import { useCallback, forwardRef } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
 import { Box, Button, CircularProgress, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
@@ -22,8 +21,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const maxSize = 1024 * 1024 * 5
 
 const Dropzone = forwardRef((props, ref) => {
-  const { file, setFile, openSnackbar, valid, setSubmissionSuccess } = props
-  const [loading, setLoading] = useState(false)
+  const { file, setFile, openSnackbar, valid, loading, setLoading } = props
 
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles?.length) {
@@ -164,27 +162,38 @@ const Dropzone = forwardRef((props, ref) => {
           border: '2px #A9A9A9 dashed',
           borderRadius: '5px',
           padding: '20px',
-          width: '425px'
+          width: '425px',
+          height: '175px'
         }}
         disabled={!valid || file !== null}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '10px'
-          }}
+        <Fade
+          in={!loading}
+          out={`${loading}`}
+          unmountOnExit
+          timeout={{ enter: 250, exit: 0 }}
         >
-          <BackupIcon
-            sx={{
-              fontSize: 100,
-            }}
+          <Box>
+            <BackupIcon
+              sx={{
+                fontSize: 100,
+              }}
+            />
+            <Typography>
+              {isDragActive ? 'Drop the files here...' : 'Drag and drop some files here, or click to select files'}
+            </Typography>
+          </Box>
+        </Fade>
+        <Fade
+          in={loading}
+          out={`${!loading}`}
+          unmountOnExit
+          timeout={{ enter: 250, exit: 0 }}
+        >
+          <CircularProgress
+            size={50}
           />
-          <Typography>
-            {isDragActive ? 'Drop the files here...' : 'Drag and drop some files here, or click to select files'}
-          </Typography>
-        </Box>
+        </Fade>
       </IconButton>
 
       <Fade in={file !== null} out={`${file === null}`}>
@@ -214,6 +223,7 @@ const Dropzone = forwardRef((props, ref) => {
                 sx={{
                   borderRadius: '5px'
                 }}
+                disabled={loading}
               >
                 <ListItemIcon >
                   <DescriptionIcon sx={{ fontSize: 40 }} />
@@ -224,26 +234,31 @@ const Dropzone = forwardRef((props, ref) => {
                 />
               </ListItemButton>
             </Tooltip>
-            <IconButton onClick={() => setFile(null)}>
+            <IconButton
+              onClick={() => setFile(null)}
+              disabled={loading}
+            >
               <DeleteForever sx={{ fontSize: 40, color: 'red' }} />
             </IconButton>
           </ListItem>
         </List>
       </Fade>
 
-      <Fade in={file !== null}>
+      <Fade
+        in={(file !== null) && !loading}
+        out={`${loading}`}
+      >
         <Button
-          variant='outlined'
+          variant='contained'
           onClick={handleSubmit}
           size="large"
-          disabled={loading}
           sx={{
             minWidth: '200px',
             height: '48px',
             position: 'relative'
           }}
         >
-          {loading ? <CircularProgress size={30} /> : "Submit"}
+          Submit
         </Button>
       </Fade>
     </Box>
