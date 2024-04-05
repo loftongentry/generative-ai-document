@@ -3,7 +3,7 @@
 //TODO: Instead of having there be two states, have the spinning logo appear over top the dropzone, and then it slides out and slides in the results. So only two slides to show
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Box, Button, CircularProgress, Fade, IconButton, Slide, Toolbar } from "@mui/material";
+import { Box, Button, Fade, IconButton, Slide, Toolbar } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -70,7 +70,7 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [valid, setValid] = useState(true)
   const [viewportWidth, setViewportWidth] = useState(0)
-  const [submissionSuccess, setSubmissionSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function Home() {
   // useEffect(() => {
   //   const eventSource = new EventSource('/api/getFileData')
 
-  //   if (!submissionSuccess) {
+  //   if (!loading) {
   //     eventSource.close()
   //     return
   //   }
@@ -109,7 +109,7 @@ export default function Home() {
   //     setSubmissionSuccess(false)
   //     eventSource.close()
   //   }
-  // }, [submissionSuccess])
+  // }, [loading])
 
   const validateUser = useCallback(async () => {
     try {
@@ -157,27 +157,44 @@ export default function Home() {
           >
             <MenuIcon />
           </IconButton>
-          {process.env.NODE_ENV === 'development' && (
-            <Box
-              sx={{
-                display: 'flex',
-                gap: '10px'
-              }}
+          <Box
+            sx={{
+              display: 'flex',
+              gap: '10px'
+            }}
+          >
+            {process.env.NODE_ENV === 'development' && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: '10px'
+                }}
+              >
+                <Button
+                  variant="contained"
+                  onClick={() => setLoading(prev => !prev)}
+                >
+                  Change Loading State
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSetResults}
+                >
+                  Change Results State
+                </Button>
+              </Box>
+            )}
+            <Fade
+              in={results}
             >
               <Button
                 variant="contained"
-                onClick={() => setSubmissionSuccess(!submissionSuccess)}
+                onClick={() => setResults(null)}
               >
-                Change Sub-Succ State
+                Clear Results
               </Button>
-              <Button
-                variant="contained"
-                onClick={handleSetResults}
-              >
-                Change Results State
-              </Button>
-            </Box>
-          )}
+            </Fade>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -195,12 +212,12 @@ export default function Home() {
         ref={mainRef}
       >
         <Slide
-          in={!submissionSuccess}
+          in={!results}
+          out={results}
           container={mainRef.current}
           direction="up"
           mountOnEnter
           unmountOnExit
-          timeout={{enter: 250, exit: 250}}
           easing={{
             enter: 'cubic-bezier(0, 1.5, .8, 1)',
           }}
@@ -210,30 +227,19 @@ export default function Home() {
             setFile={setFile}
             openSnackbar={openSnackbar}
             valid={valid}
-            setSubmissionSuccess={setSubmissionSuccess}
+            loading={loading}
+            setLoading={setLoading}
           />
         </Slide>
         <Fade
-          in={submissionSuccess}
-          out={`${results !== null}`}
+          in={results}
+          out={!results}
+          container={mainRef.current}
           mountOnEnter
           unmountOnExit
-          container={mainRef.current}
           timeout={{ enter: 500, exit: 0 }}
           style={{
-            transitionDelay: '300ms'
-          }}
-        >
-          <CircularProgress />
-        </Fade>
-        <Fade
-          in={results !== null}
-          mountOnEnter
-          unmountOnExit
-          container={mainRef.current}
-          timeout={{ enter: 500, exit: 0 }}
-          style={{
-            transitionDelay: '300ms'
+            transitionDelay: '250ms'
           }}
         >
           <Results

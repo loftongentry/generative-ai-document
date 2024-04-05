@@ -42,156 +42,160 @@ const Results = forwardRef((props, ref) => {
   }
 
   return (
-    <Stack
-      spacing={1}
+    <div
       ref={ref}
+      {...props}
     >
-      <Box>
-        <Item>
-          <Image
-            src={results?.doc_image || ''}
-            alt='Analyzed Document'
-          />
-        </Item>
-      </Box>
-      <Divider />
-      {/* Slightly shifted over, need to fix that */}
-      <Grid
-        container
+      <Stack
         spacing={1}
-        sx={{ flexGrow: 1 }}
       >
-        <Grid
-          item
-          xs={4}
-        >
+        <Box>
           <Item>
-            {results?.doc_text}
+            <Image
+              src={results?.doc_image || ''}
+              alt='Analyzed Document'
+            />
           </Item>
-        </Grid>
+        </Box>
+        <Divider />
+        {/* Slightly shifted over, need to fix that */}
         <Grid
-          item
-          xs={4}
+          container
+          spacing={1}
+          sx={{ flexGrow: 1 }}
         >
-          <Item>
-            {results?.doc_summary}
-          </Item>
-        </Grid>
-        <Grid item xs={4}>
-          <Item>
-            <Stack
-              spacing={1}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between'
-                }}
+          <Grid
+            item
+            xs={4}
+          >
+            <Item>
+              {results?.doc_text}
+            </Item>
+          </Grid>
+          <Grid
+            item
+            xs={4}
+          >
+            <Item>
+              {results?.doc_summary}
+            </Item>
+          </Grid>
+          <Grid item xs={4}>
+            <Item>
+              <Stack
+                spacing={1}
               >
-                <Typography>
-                  Image Quality Score
-                </Typography>
-                <Typography>
-                  {`${results?.quality_score}%`}
-                </Typography>
-              </Box>
-              <Divider />
-              <Accordion
-                expanded={langExapanded}
-                onChange={() => handleExpandChange('lang')}
-                sx={{
-                  maxHeight: '200px',
-                  overflowY: 'scroll',
-                  '&::-webkit-scrollbar': {
-                    width: '5px',
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    borderRadius: '8px',
-                    minHeight: '24px',
-                    backgroundColor: 'transparent'
-                  },
-                  '&:hover::-webkit-scrollbar-thumb': {
-                    backgroundColor: '#b7b7b7'
-                  }
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ArrowDropDownIcon />}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                  }}
                 >
                   <Typography>
-                    Detected Languages
+                    Image Quality Score
                   </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {results?.detected_languages.map((lang) => (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                      }}
-                      key={`${lang.languageCode}`}
-                    >
-                      <Typography>
-                        {getLangName(lang.languageCode)}
-                      </Typography>
-                      <Typography>
-                        {`${lang.confidence}%`}
-                      </Typography>
-                    </Box>
-                  ))}
-                </AccordionDetails>
-              </Accordion>
-              <Divider />
-              <Accordion
-                expanded={wordCountExapnded}
-                onChange={() => handleExpandChange('wordCount')}
-                sx={{
-                  maxHeight: '200px',
-                  overflowY: 'scroll',
-                  '&::-webkit-scrollbar': {
-                    width: '5px',
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    borderRadius: '8px',
-                    minHeight: '24px',
-                    backgroundColor: 'transparent'
-                  },
-                  '&:hover::-webkit-scrollbar-thumb': {
-                    backgroundColor: '#b7b7b7'
-                  }
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ArrowDropDownIcon />}
-                >
                   <Typography>
-                    Word Prevalence
+                    {`${results?.quality_score}%`}
                   </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {results && Object.entries(results?.word_counts).map(([key, value]) => (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                      }}
-                      key={`word-count-${key}`}
-                    >
-                      <Typography>
-                        {key}
-                      </Typography>
-                      <Typography>
-                        {value}
-                      </Typography>
-                    </Box>
-                  ))}
-                </AccordionDetails>
-              </Accordion>
-            </Stack>
-          </Item>
+                </Box>
+                <Divider />
+                <Accordion
+                  expanded={langExapanded}
+                  onChange={() => handleExpandChange('lang')}
+                  sx={{
+                    maxHeight: '200px',
+                    overflowY: 'scroll',
+                    '&::-webkit-scrollbar': {
+                      width: '5px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      borderRadius: '8px',
+                      minHeight: '24px',
+                      backgroundColor: 'transparent'
+                    },
+                    '&:hover::-webkit-scrollbar-thumb': {
+                      backgroundColor: '#b7b7b7'
+                    }
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ArrowDropDownIcon />}
+                  >
+                    <Typography>
+                      Detected Languages
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {results?.detected_languages.map((lang) => (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                        }}
+                        key={`${lang.languageCode}`}
+                      >
+                        <Typography>
+                          {getLangName(lang.languageCode)}
+                        </Typography>
+                        <Typography>
+                          {`${lang.confidence}%`}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </AccordionDetails>
+                </Accordion>
+                <Divider />
+                <Accordion
+                  expanded={wordCountExapnded}
+                  onChange={() => handleExpandChange('wordCount')}
+                  sx={{
+                    maxHeight: '200px',
+                    overflowY: 'scroll',
+                    '&::-webkit-scrollbar': {
+                      width: '5px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      borderRadius: '8px',
+                      minHeight: '24px',
+                      backgroundColor: 'transparent'
+                    },
+                    '&:hover::-webkit-scrollbar-thumb': {
+                      backgroundColor: '#b7b7b7'
+                    }
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ArrowDropDownIcon />}
+                  >
+                    <Typography>
+                      Word Prevalence
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {results && Object.entries(results?.word_counts).map(([key, value]) => (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between'
+                        }}
+                        key={`word-count-${key}`}
+                      >
+                        <Typography>
+                          {key}
+                        </Typography>
+                        <Typography>
+                          {value}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </AccordionDetails>
+                </Accordion>
+              </Stack>
+            </Item>
+          </Grid>
         </Grid>
-      </Grid>
-    </Stack>
+      </Stack>
+    </div>
   )
 })
 
