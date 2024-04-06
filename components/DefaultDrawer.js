@@ -18,7 +18,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TestItems } from "@/test/TestItems";
 
 const DefaultDrawer = (props) => {
-  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, valid } = props
+  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, valid, setResults } = props
   const { data: session } = useSession()
   const [listItems, setListItems] = useState(TestItems)
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
@@ -118,6 +118,7 @@ const DefaultDrawer = (props) => {
             gap: '5px'
           }}
           disabled={!valid}
+          onClick={() => setResults(null)}
         >
           <InsertDriveFileIcon />
           <Typography>
