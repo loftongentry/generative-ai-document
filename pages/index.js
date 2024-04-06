@@ -1,4 +1,6 @@
 //TODO: Handling use SSE
+//TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
+//TODO: Why does the content shift over when the snackbar appears?
 //TODO: Use "getServerSideProps" when fetching data post authorization from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
@@ -140,7 +142,11 @@ export default function Home() {
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box
+      sx={{
+        display: 'flex',
+      }}
+    >
       <AppBar>
         <Toolbar
           sx={{
@@ -184,7 +190,8 @@ export default function Home() {
               </Box>
             )}
             <Fade
-              in={results !== null}
+              in={results !== null && !drawerOpen}
+              unmountOnExit
             >
               <Button
                 variant="contained"
@@ -203,6 +210,7 @@ export default function Home() {
         drawerWidth={drawerWidth}
         viewportWidth={viewportWidth}
         valid={valid}
+        setResults={setResults}
       />
 
       <Main
@@ -244,11 +252,13 @@ export default function Home() {
             zIndex: 1
           }}
         >
-          <Results
-            results={results}
-            viewportwidth={viewportWidth}
-            openSnackbar={openSnackbar}
-          />
+          <div>
+            <Results
+              results={results}
+              viewportWidth={viewportWidth}
+              openSnackbar={openSnackbar}
+            />
+          </div>
         </Fade>
       </Main>
 
