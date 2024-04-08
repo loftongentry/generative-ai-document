@@ -43,7 +43,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }))
 
 const Results = forwardRef((props, ref) => {
-  const { results, viewportWidth, openSnackbar } = props
+  const { results, viewportWidth, openSnackbar, resultGridScale } = props
   const [langExapanded, setLangExpanded] = useState(false)
   const [wordCountExapnded, setWordCountExpanded] = useState(false)
 
@@ -85,6 +85,10 @@ const Results = forwardRef((props, ref) => {
           <Image
             src={results?.doc_image || ''}
             alt='Analyzed Document'
+            style={{
+              maxHeight: '100%',
+              maxWidth: '100%'
+            }}
           />
         </Item>
       </Box>
@@ -95,7 +99,7 @@ const Results = forwardRef((props, ref) => {
       >
         <Grid
           item
-          xs={viewportWidth <= 425 ? 12 : 4}
+          xs={resultGridScale ? 12 : 4}
         >
           <Item>
             <CustomToolbar
@@ -107,7 +111,7 @@ const Results = forwardRef((props, ref) => {
         </Grid>
         <Grid
           item
-          xs={viewportWidth <= 425 ? 12 : 4}
+          xs={resultGridScale ? 12 : 4}
         >
           <Item>
             <CustomToolbar
@@ -119,7 +123,7 @@ const Results = forwardRef((props, ref) => {
         </Grid>
         <Grid
           item
-          xs={viewportWidth <= 425 ? 12 : 4}
+          xs={resultGridScale ? 12 : 4}
         >
           <Item>
             <Stack

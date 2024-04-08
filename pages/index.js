@@ -1,3 +1,4 @@
+//TODO: Handling all transitions and styling based on window width
 //TODO: Handling use SSE
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Why does the content shift over when the snackbar appears?
@@ -71,6 +72,8 @@ export default function Home() {
   const [viewportWidth, setViewportWidth] = useState(0)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [dropzoneScale, setDropzoneScale] = useState(false)
+  const [resultsScale, setResultsScale] = useState(false)
+  const [resultGridScale, setResultGridScale] = useState(false)
   const [valid, setValid] = useState(true)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
@@ -80,7 +83,9 @@ export default function Home() {
       const width = window.innerWidth
       setViewportWidth(width)
       setDrawerOpen(width >= 768)
+      setResultsScale(width < 768)
       setDropzoneScale(width <= 425)
+      setResultGridScale(width <= 425)
     }
 
     handleResize()
@@ -92,6 +97,14 @@ export default function Home() {
     }
 
   }, [])
+
+  useEffect(() => {
+    if (results) {
+      setDrawerOpen(false)
+    } else if (!results) {
+      setDrawerOpen(true)
+    }
+  }, [results])
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -261,7 +274,8 @@ export default function Home() {
           style={{
             transitionDelay: '250ms',
             position: 'absolute',
-            zIndex: 1
+            zIndex: 1,
+            transform: resultsScale ? 'scale(0.8)' : 'none'
           }}
         >
           <div>
@@ -269,6 +283,7 @@ export default function Home() {
               results={results}
               viewportWidth={viewportWidth}
               openSnackbar={openSnackbar}
+              resultGridScale={resultGridScale}
             />
           </div>
         </Fade>
