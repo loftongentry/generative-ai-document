@@ -1,10 +1,10 @@
 //TODO: Handling use SSE
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Why does the content shift over when the snackbar appears?
-//TODO: Use "getServerSideProps" when fetching data post authorization from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
+//TODO: Use "getServerSideProps" when fetching data (post authorization) from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Box, Button, Fade, IconButton, Slide, Toolbar } from "@mui/material";
+import { Box, Button, Fade, IconButton, Toolbar } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -68,17 +68,29 @@ export default function Home() {
   const mainRef = useRef(null)
   const email = session?.user?.email
   const [file, setFile] = useState(null)
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [valid, setValid] = useState(true)
   const [viewportWidth, setViewportWidth] = useState(0)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [dropzoneScale, setDropzoneScale] = useState(false)
+  const [valid, setValid] = useState(true)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
 
   useEffect(() => {
-    setViewportWidth(window.innerWidth)
-    if (window.innerWidth >= 768) {
-      setDrawerOpen(true)
+    const handleResize = () => {
+      const width = window.innerWidth
+      setViewportWidth(width)
+      setDrawerOpen(width >= 768)
+      setDropzoneScale(width <= 425)
     }
+
+    handleResize()
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+
   }, [])
 
   useEffect(() => {
@@ -218,28 +230,28 @@ export default function Home() {
         viewportwidth={viewportWidth}
         ref={mainRef}
       >
-        <Slide
+        <Fade
           in={!results}
-          out={`${results}`}
+          out={`${results !== null}`}
           container={mainRef.current}
-          direction="up"
           mountOnEnter
           unmountOnExit
-          easing={{
-            enter: 'cubic-bezier(0, 1.5, .8, 1)',
+          style={{
+            position: 'relative',
+            transform: dropzoneScale ? 'scale(0.8)' : 'none'
           }}
-          style={{ position: 'relative' }}
         >
-          <Dropzone
-            file={file}
-            setFile={setFile}
-            openSnackbar={openSnackbar}
-            valid={valid}
-            loading={loading}
-            setLoading={setLoading}
-            viewportwidth={viewportWidth}
-          />
-        </Slide>
+          <div>
+            <Dropzone
+              file={file}
+              setFile={setFile}
+              openSnackbar={openSnackbar}
+              valid={valid}
+              loading={loading}
+              setLoading={setLoading}
+            />
+          </div>
+        </Fade>
         <Fade
           in={results !== null}
           container={mainRef.current}

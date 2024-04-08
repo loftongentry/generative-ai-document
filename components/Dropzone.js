@@ -6,7 +6,7 @@
  * 4. On clear, slides back to submission pagey
  */
 //TODO: Not receiving a response from API
-import { useCallback, forwardRef } from "react"
+import { useCallback, forwardRef, useEffect } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
 import { Box, Button, CircularProgress, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
@@ -21,7 +21,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const maxSize = 1024 * 1024 * 5
 
 const Dropzone = forwardRef((props, ref) => {
-  const { file, setFile, openSnackbar, valid, loading, setLoading, viewportwidth } = props
+  const { file, setFile, openSnackbar, valid, loading, setLoading } = props
 
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles?.length) {
@@ -139,7 +139,7 @@ const Dropzone = forwardRef((props, ref) => {
       console.error(`Error uploading document to google cloud: ${error}`)
       openSnackbar({ message: 'There was an error uploading your document, please try again later', severity: 'error' })
       setLoading(false)
-    } 
+    }
   }
 
   return (
