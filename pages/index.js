@@ -1,4 +1,22 @@
-//TODO: Handling all transitions and styling based on window width
+/**
+ * TODO: Handling all transitions and styling based on window width
+ * 1. Desktop mode (1440p):
+ *    - Dropzone is normal sized
+ *    - Results is normal sized
+ *    - Drawer not hidden when results appear
+ * 2. Laptop (1024p):
+ *    - Dropzone is normal sized
+ *    - Results is normal sized
+ *    - Drawer is hidden when results appear 
+ * 3. Tablet (768p):
+ *    - Dropzone is normal sized
+ *    - Results is small size
+ *    - Drawer is hidden when results appear
+ * 4. Mobile (425p):
+ *    - Dropzone is normal sized
+ *    - Results are in grid format
+ *    - Drawer is always hidden
+ */
 //TODO: Handling use SSE
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Why does the content shift over when the snackbar appears?

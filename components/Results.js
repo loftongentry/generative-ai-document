@@ -1,3 +1,4 @@
+//TODO: Make sure that the image is not being hidden by the App Bar (BUG)
 //TODO: Clicking on the block with the doc text or the doc summary, opens a modal (or something) so it's easier to read for end user to digest
 //TODO: If document is a PDF, then it's displayed as a PDF displayer. (PNG/JPG/JPEG need to be smaller)
 import { forwardRef, useState } from "react"
