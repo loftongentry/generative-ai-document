@@ -6,7 +6,7 @@
  * 4. On clear, slides back to submission pagey
  */
 //TODO: Not receiving a response from API
-import { useCallback, forwardRef, useEffect } from "react"
+import { useCallback, forwardRef } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
 import { Box, Button, CircularProgress, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography, Zoom } from "@mui/material"
