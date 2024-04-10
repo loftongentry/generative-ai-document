@@ -1,10 +1,9 @@
-//TODO: Make it so, when editing the input, places you inside the input to type immediately
-//TODO: Settings modal
-//TODO: Change styling of scrollbar
 //TODO: If you're viewing that document's analysis, highlight that icon button with that item
+//TODO: Functionality for the options in the settings modal
 //TODO: For each of the ListItems, the onBlur should send an API request to google cloud, which changes the name (should also make the mouse non-clickable and spinning logo)
+//NOTE: To get them to appear in order, have it sort the list of items based on last edited, and then by creation date (it that's possible)
 import { useState } from "react";
-import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon, CssBaseline } from '@mui/material';
+import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import SettingsModal from "./DrawerComponents/SettingsModal";
 import LoginIcon from '@mui/icons-material/Login';
@@ -16,6 +15,49 @@ import CreateIcon from '@mui/icons-material/Create';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TestItems } from "@/test/TestItems";
+
+const DeleteModal = (props) => {
+  const { open, onClose, selectedItem } = props
+
+  //Function to delete file analysis from firestore
+  //Close modal upon success and setSelectedItem to null
+  const handleDelete = async () => {
+    try {
+
+    } catch (error) {
+
+    }
+  }
+
+  return (
+    <Dialog
+      open={open}
+      maxWidth='sm'
+      fullWidth={true}
+    >
+      <DialogTitle>
+        Delete Analysis
+      </DialogTitle>
+      <DialogContent dividers>
+        This will delete the analysis for <b>{selectedItem?.name}</b>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="outlined"
+          onClick={onClose}
+        >
+          Close
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+        >
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
 
 const DefaultDrawer = (props) => {
   const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, valid, setResults } = props
@@ -29,6 +71,7 @@ const DefaultDrawer = (props) => {
   const [editing, setEditing] = useState(false)
   const [editedName, setEditedName] = useState('')
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
+  const [deleteModal, setDeleteModal] = useState(false)
 
   const handleProfileMenuOpen = (event) => {
     setProfileMenuOpen(true)
@@ -51,12 +94,23 @@ const DefaultDrawer = (props) => {
     setListItemAnchorEl(null)
   }
 
+  const handleOpenDeleteModalOpen = () => {
+    setDeleteModal(true)
+    handleListItemMenuClose()
+  }
+
+  const handleDeleteModalClose = () => {
+    setDeleteModal(false)
+    setSelectedItem(null)
+  }
+
   const handleSignOut = async () => {
     localStorage.removeItem('uuid')
     handleProfileMenuClose()
     signOut()
   }
 
+  //Temp
   const handleListItem = (action) => {
     if (action === 'Delete') {
       const updatedList = listItems.filter(item => item.name !== selectedItem.name)
@@ -69,13 +123,24 @@ const DefaultDrawer = (props) => {
     handleListItemMenuClose()
   }
 
-  //This is done to set the edited item to the top of the list after it's name has been changed
+  //Temp
   const handleSaveEdit = () => {
     const filteredList = listItems.filter(item => item !== selectedItem)
     const updatedList = [{ ...selectedItem, name: editedName }, ...filteredList]
 
     setListItems(updatedList)
     setEditing(false)
+  }
+
+  //Funtion to update name of file analysis in firestore
+  //onBlur should execute this function
+  //setSelectedItem to null upon success
+  const saveEdit = async () => {
+    try {
+
+    } catch (error) {
+
+    }
   }
 
   const handleSettingsModalOpen = () => {
@@ -205,7 +270,7 @@ const DefaultDrawer = (props) => {
               <ListItemText>Change Name</ListItemText>
             </MenuItem>
             <MenuItem
-              onClick={() => handleListItem("Delete")}
+              onClick={handleOpenDeleteModalOpen}
               sx={{ color: '#ff7f7f' }}
             >
               <ListItemIcon sx={{ color: '#ff7f7f' }}>
@@ -278,6 +343,11 @@ const DefaultDrawer = (props) => {
         settingsModalOpen={settingsModalOpen}
         handleSettingsModalClose={handleSettingsModalClose}
         viewportWidth={viewportWidth}
+      />
+      <DeleteModal
+        open={deleteModal}
+        onClose={handleDeleteModalClose}
+        selectedItem={selectedItem}
       />
     </Drawer>
   )
