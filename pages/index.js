@@ -1,22 +1,3 @@
-/**
- * TODO: Handling all transitions and styling based on window width
- * 1. Desktop mode (1440p):
- *    - Dropzone is normal sized
- *    - Results is normal sized
- *    - Drawer not hidden when results appear
- * 2. Laptop (1024p):
- *    - Dropzone is normal sized
- *    - Results is normal sized
- *    - Drawer is hidden when results appear 
- * 3. Tablet (768p):
- *    - Dropzone is normal sized
- *    - Results is small size
- *    - Drawer is hidden when results appear
- * 4. Mobile (425p):
- *    - Dropzone is normal sized
- *    - Results are in grid format
- *    - Drawer is always hidden
- */
 //TODO: Handling use SSE
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Why does the content shift over when the snackbar appears?
@@ -100,10 +81,15 @@ export default function Home() {
     const handleResize = () => {
       const width = window.innerWidth
       setViewportWidth(width)
-      setDrawerOpen(width >= 768)
-      setResultsScale(width < 768)
+
+      setResultsScale(width <= 768)
       setDropzoneScale(width <= 425)
       setResultGridScale(width <= 425)
+      if ((width <= 1024 && results) || width <= 425) {
+        setDrawerOpen(false)
+      } else if (width > 425 && !results) {
+        setDrawerOpen(true)
+      }
     }
 
     handleResize()
@@ -114,14 +100,6 @@ export default function Home() {
       window.removeEventListener('resize', handleResize)
     }
 
-  }, [])
-
-  useEffect(() => {
-    if (results) {
-      setDrawerOpen(false)
-    } else if (!results) {
-      setDrawerOpen(true)
-    }
   }, [results])
 
   useEffect(() => {
