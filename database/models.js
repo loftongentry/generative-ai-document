@@ -1,5 +1,5 @@
 //TODO: Remove documentIDs column, first used
-const { Sequelize, DataTypes } = require('sequelize')
+const { DataTypes } = require('sequelize')
 const { sequelize } = require('./db_def')
 
 const User = sequelize.define('userbase', {
@@ -51,24 +51,12 @@ const User = sequelize.define('userbase', {
     field: 'documents_remaining',
     comment: 'The number of active documents that the user can still see analysis results for'
   },
-  firstUsed: {
-    type: DataTypes.DATE,
-    allowNull: true,
-    field: 'first_used',
-    comment: 'The first time the user actually uses the analyzer. This value should not change'
-  },
   lastUsed: {
     type: DataTypes.DATE,
     allowNull: true,
     field: 'last_used',
     comment: 'The last time that the user uses the analyzer'
   },
-  documentIds: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
-    allowNull: true,
-    field: 'document_ids',
-    comment: `ID's for documents that are stored in cloud storage`
-  }
 },
   {
     freezeTableName: true
