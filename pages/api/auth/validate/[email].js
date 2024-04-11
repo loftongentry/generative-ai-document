@@ -1,3 +1,4 @@
+//Change how the latestlogin is updated because these can't be within the same route
 import { User } from "@/database/models";
 import { getDate } from "@/lib/getDate";
 
