@@ -1,4 +1,4 @@
-//TODO: Make sure that the image is not being hidden by the App Bar (BUG)
+//TODO: Make sure that the image is not being hidden by the App Bar when not in desktop mode
 //TODO: Clicking on the block with the doc text or the doc summary, opens a modal (or something) so it's easier to read for end user to digest
 //TODO: If document is a PDF, then it's displayed as a PDF displayer. (PNG/JPG/JPEG need to be smaller)
 import { forwardRef, useState } from "react"
@@ -87,7 +87,7 @@ const Results = forwardRef((props, ref) => {
             src={results?.doc_image || ''}
             alt='Analyzed Document'
             style={{
-              maxHeight: '100%',
+              //maxHeight: '100%',
               maxWidth: '100%'
             }}
           />
