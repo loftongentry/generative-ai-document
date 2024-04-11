@@ -1,5 +1,7 @@
 import NextAuth from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
+import { FirestoreAdapter } from "@auth/firebase-adapter";
+import { firestore } from "@/lib/firestore";
 
 const GOOGLE_OAUTH_ID = process.env.GOOGLE_OAUTH_ID
 const GOOGLE_OAUTH_SECRET = process.env.GOOGLE_OAUTH_SECRET
@@ -22,6 +24,7 @@ const authOptions = {
       }
     })
   ],
+  adapter: FirestoreAdapter(firestore),
   callbacks: {
     async jwt({ token, user, account }) {
       if (Date.now() >= token.google_refresh) {
