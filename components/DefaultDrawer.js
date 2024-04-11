@@ -2,7 +2,7 @@
 //TODO: Functionality for the options in the settings modal
 //TODO: For each of the ListItems, the onBlur should send an API request to google cloud, which changes the name (should also make the mouse non-clickable and spinning logo)
 //NOTE: To get them to appear in order, have it sort the list of items based on last edited, and then by creation date (it that's possible)
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import SettingsModal from "./DrawerComponents/SettingsModal";
@@ -60,7 +60,7 @@ const DeleteModal = (props) => {
 }
 
 const DefaultDrawer = (props) => {
-  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, valid, setResults } = props
+  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, setResults } = props
   const { data: session } = useSession()
   const [listItems, setListItems] = useState(TestItems)
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
@@ -72,6 +72,15 @@ const DefaultDrawer = (props) => {
   const [editedName, setEditedName] = useState('')
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
+  const valid = session?.user
+
+  useEffect(() => {
+    if(valid){
+
+    } else {
+      setListItems(null)
+    }
+  }, [valid])
 
   const handleProfileMenuOpen = (event) => {
     setProfileMenuOpen(true)
@@ -152,6 +161,11 @@ const DefaultDrawer = (props) => {
     setSettingsModalOpen(false)
   }
 
+  //Handle setting list items in dev versus production
+  const handleSetListItems = () => {
+
+  }
+
   return (
     <Drawer
       sx={{
@@ -212,7 +226,7 @@ const DefaultDrawer = (props) => {
         }}
       >
         <List>
-          {listItems.map((item, index) => (
+          {listItems?.map((item, index) => (
             <ListItem
               key={item.name}
               sx={{
