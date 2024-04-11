@@ -1,6 +1,7 @@
 //TODO: Handling use SSE
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Why does the content shift over when the snackbar appears?
+//TODO: Different way of updating last login for user since it can be within the same API route
 //TODO: Use "getServerSideProps" when fetching data (post authorization) from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
@@ -73,7 +74,6 @@ export default function Home() {
   const [dropzoneScale, setDropzoneScale] = useState(false)
   const [resultsScale, setResultsScale] = useState(false)
   const [resultGridScale, setResultGridScale] = useState(false)
-  const [valid, setValid] = useState(true)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
 
@@ -104,7 +104,13 @@ export default function Home() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      //validateUser()
+      const uuid = localStorage.getItem('uuid')
+
+      if (!uuid) {
+        validateUser()
+      } else {
+        return
+      }
     }
   }, [status])
 
@@ -147,7 +153,6 @@ export default function Home() {
       const uuid = response.uuid
 
       localStorage.setItem('uuid', uuid)
-      setValid(true)
     } catch (error) {
       console.error(`Error occurred when logging in user: ${error}`)
       openSnackbar({ message: 'Error signing in user', severity: 'error' })
@@ -158,6 +163,7 @@ export default function Home() {
     setDrawerOpen(!drawerOpen)
   }
 
+  //Handle set results if in dev versus production
   const handleSetResults = () => {
     setResults((prevResults) => prevResults === null ? TestResult : null);
   }
@@ -230,7 +236,6 @@ export default function Home() {
         handleDrawer={handleDrawer}
         drawerWidth={drawerWidth}
         viewportWidth={viewportWidth}
-        valid={valid}
         setResults={setResults}
       />
 
@@ -255,7 +260,6 @@ export default function Home() {
               file={file}
               setFile={setFile}
               openSnackbar={openSnackbar}
-              valid={valid}
               loading={loading}
               setLoading={setLoading}
             />
