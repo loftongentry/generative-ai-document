@@ -1,8 +1,9 @@
+//TODO: Prevent from constantly fetching
 //TODO: If you're viewing that document's analysis, highlight that icon button with that item
 //TODO: Functionality for the options in the settings modal
 //TODO: For each of the ListItems, the onBlur should send an API request to google cloud, which changes the name (should also make the mouse non-clickable and spinning logo)
 //NOTE: To get them to appear in order, have it sort the list of items based on last edited, and then by creation date (it that's possible)
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import SettingsModal from "./DrawerComponents/SettingsModal";
@@ -14,7 +15,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { TestItems } from "@/test/TestItems";
+//import { TestItems } from "@/test/TestItems";
 
 const DeleteModal = (props) => {
   const { open, onClose, selectedItem } = props
@@ -60,9 +61,9 @@ const DeleteModal = (props) => {
 }
 
 const DefaultDrawer = (props) => {
-  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, setResults } = props
+  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, setResults, openSnackbar } = props
   const { data: session } = useSession()
-  const [listItems, setListItems] = useState(TestItems)
+  const [listItems, setListItems] = useState([])
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [listItemAnchorEl, setListItemAnchorEl] = useState(null)
@@ -74,13 +75,28 @@ const DefaultDrawer = (props) => {
   const [deleteModal, setDeleteModal] = useState(false)
   const valid = session?.user
 
-  useEffect(() => {
-    if(valid){
+  const fetchFirestoreAnalysis = useCallback(async () => {
+    try {
+      const uuid = localStorage.getItem('uuid')
+      const res = await fetch(`/api/fetchAnalysis/${uuid}`)
 
-    } else {
-      setListItems(null)
+      if (!res.ok) {
+        throw new Error(`${res.status} - ${res.statusText}`)
+      }
+
+    } catch (error) {
+      console.error(`Error retrieving user's items from Firestore: ${error}`)
+      openSnackbar({ message: `Unable to retrieve your document analysis, please try again later`, severity: 'error' })
     }
-  }, [valid])
+  }, [])
+
+  useEffect(() => {
+    if (valid) {
+      fetchFirestoreAnalysis()
+    } else {
+      setListItems([])
+    }
+  }, [valid, fetchFirestoreAnalysis])
 
   const handleProfileMenuOpen = (event) => {
     setProfileMenuOpen(true)
