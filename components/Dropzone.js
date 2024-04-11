@@ -14,6 +14,7 @@ import BackupIcon from '@mui/icons-material/Backup';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DeleteForever from "@mui/icons-material/DeleteForever";
 import { Document, Page, pdfjs } from 'react-pdf';
+import { useSession } from "next-auth/react";
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -21,7 +22,9 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const maxSize = 1024 * 1024 * 5
 
 const Dropzone = forwardRef((props, ref) => {
-  const { file, setFile, openSnackbar, valid, loading, setLoading } = props
+  const { data: session } = useSession()
+  const { file, setFile, openSnackbar, loading, setLoading } = props
+  const valid = session?.user
 
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles?.length) {
@@ -163,7 +166,7 @@ const Dropzone = forwardRef((props, ref) => {
           width: '425px',
           height: '175px',
         }}
-        disabled={!valid || file !== null}
+        disabled={!valid || file !== null || loading}
       >
         <Fade
           in={!loading}
@@ -178,7 +181,7 @@ const Dropzone = forwardRef((props, ref) => {
               }}
             />
             <Typography>
-              {isDragActive ? 'Drop the files here...' : 'Drag and drop some files here, or click to select files'}
+              {isDragActive ? 'Drop the file here...' : 'Drag and drop file here, or click to select file'}
             </Typography>
           </Box>
         </Fade>
