@@ -14,7 +14,7 @@ import Dropzone from "@/components/Dropzone";
 import Results from "@/components/Results";
 import CustomSnackbar from "@/components/CustomSnackbar";
 import { useSnackbar } from "@/context/SnackbarContext";
-import { TestResult } from "@/test/TestResult";
+//import { TestResult } from "@/test/TestResult";
 
 const drawerWidth = 240
 
@@ -237,6 +237,7 @@ export default function Home() {
         drawerWidth={drawerWidth}
         viewportWidth={viewportWidth}
         setResults={setResults}
+        openSnackbar={openSnackbar}
       />
 
       <Main
