@@ -15,7 +15,6 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-//import { TestItems } from "@/test/TestItems";
 
 const DeleteModal = (props) => {
   const { open, onClose, selectedItem } = props
@@ -61,42 +60,17 @@ const DeleteModal = (props) => {
 }
 
 const DefaultDrawer = (props) => {
-  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, setResults, openSnackbar } = props
+  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, setResults, listItems, setListItems, selectedItem, setSelectedItem } = props
   const { data: session } = useSession()
-  const [listItems, setListItems] = useState([])
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [listItemAnchorEl, setListItemAnchorEl] = useState(null)
   const [listItemMenuOpen, setListItemMenuOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState(null)
   const [editing, setEditing] = useState(false)
   const [editedName, setEditedName] = useState('')
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
   const valid = session?.user
-
-  const fetchFirestoreAnalysis = useCallback(async () => {
-    try {
-      const uuid = localStorage.getItem('uuid')
-      const res = await fetch(`/api/fetchAnalysis/${uuid}`)
-
-      if (!res.ok) {
-        throw new Error(`${res.status} - ${res.statusText}`)
-      }
-
-    } catch (error) {
-      console.error(`Error retrieving user's items from Firestore: ${error}`)
-      openSnackbar({ message: `Unable to retrieve your document analysis, please try again later`, severity: 'error' })
-    }
-  }, [])
-
-  useEffect(() => {
-    if (valid) {
-      fetchFirestoreAnalysis()
-    } else {
-      setListItems([])
-    }
-  }, [valid, fetchFirestoreAnalysis])
 
   const handleProfileMenuOpen = (event) => {
     setProfileMenuOpen(true)
@@ -175,11 +149,6 @@ const DefaultDrawer = (props) => {
 
   const handleSettingsModalClose = () => {
     setSettingsModalOpen(false)
-  }
-
-  //Handle setting list items in dev versus production
-  const handleSetListItems = () => {
-
   }
 
   return (
@@ -270,7 +239,7 @@ const DefaultDrawer = (props) => {
                   />
                 ) : (
                   <Typography noWrap>
-                    {item.name}
+                    {item.file_name}
                   </Typography>
                 )}
               </ListItemButton>
