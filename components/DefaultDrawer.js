@@ -1,10 +1,9 @@
-//TODO: Prevent from constantly fetching
-//TODO: If you're viewing that document's analysis, highlight that icon button with that item
 //TODO: Functionality for the options in the settings modal
+//TODO: Don't set results to the value you've clicked on when editing the name
 //TODO: For each of the ListItems, the onBlur should send an API request to google cloud, which changes the name (should also make the mouse non-clickable and spinning logo)
 //NOTE: To get them to appear in order, have it sort the list of items based on last edited, and then by creation date (it that's possible)
-import { useCallback, useEffect, useState } from "react";
-import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, Icon, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
+import { useState } from "react";
+import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import SettingsModal from "./DrawerComponents/SettingsModal";
 import LoginIcon from '@mui/icons-material/Login';
@@ -60,7 +59,7 @@ const DeleteModal = (props) => {
 }
 
 const DefaultDrawer = (props) => {
-  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, setResults, listItems, setListItems, selectedItem, setSelectedItem } = props
+  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, listItems, setListItems } = props
   const { data: session } = useSession()
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
@@ -70,6 +69,7 @@ const DefaultDrawer = (props) => {
   const [editedName, setEditedName] = useState('')
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
   const valid = session?.user
 
   const handleProfileMenuOpen = (event) => {
@@ -116,27 +116,20 @@ const DefaultDrawer = (props) => {
       setListItems(updatedList)
     } else if (action === 'Change Name') {
       setEditing(true)
-      setEditedName(selectedItem.name)
+      setEditedName(selectedItem.file_name)
     }
 
     handleListItemMenuClose()
   }
 
-  //Temp
-  const handleSaveEdit = () => {
-    const filteredList = listItems.filter(item => item !== selectedItem)
-    const updatedList = [{ ...selectedItem, name: editedName }, ...filteredList]
-
-    setListItems(updatedList)
-    setEditing(false)
-  }
-
   //Funtion to update name of file analysis in firestore
   //onBlur should execute this function
   //setSelectedItem to null upon success
-  const saveEdit = async () => {
+  const handleSaveEdit = async () => {
     try {
 
+      setEditing(false)
+      setEditedName('')
     } catch (error) {
 
     }
@@ -213,7 +206,7 @@ const DefaultDrawer = (props) => {
         <List>
           {listItems?.map((item, index) => (
             <ListItem
-              key={item.name}
+              key={item.id}
               sx={{
                 marginBottom: index !== listItems.length - 1 ? '8px' : 0,
               }}
@@ -229,6 +222,8 @@ const DefaultDrawer = (props) => {
                 sx={{
                   borderRadius: '5px'
                 }}
+                onClick={() => setResults(item)}
+                selected={results?.id === item?.id}
               >
                 {editing && selectedItem === item ? (
                   <Input
