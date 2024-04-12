@@ -13,7 +13,10 @@ export default async function handler(req, res) {
 
   try {
     const querySnapshot = await firestore.collection(`${collection}`).where('user_uuid', '==', `${uuid}`).get()
-    const data = querySnapshot.docs.map(doc => doc.data())
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data() 
+    }))
 
     return res.status(200).json(data)
   } catch (error) {
