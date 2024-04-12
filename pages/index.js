@@ -2,7 +2,7 @@
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Why does the content shift over when the snackbar appears?
 //TODO: Different way of updating last login for user since it can be within the same API route
-//TODO: Use "getServerSideProps" when fetching data (post authorization) from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
+//TODO (MAYBE): Use "getServerSideProps" when fetching data (post authorization) from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Box, Button, Fade, IconButton, Toolbar } from "@mui/material";
@@ -14,7 +14,6 @@ import Dropzone from "@/components/Dropzone";
 import Results from "@/components/Results";
 import CustomSnackbar from "@/components/CustomSnackbar";
 import { useSnackbar } from "@/context/SnackbarContext";
-//import { TestResult } from "@/test/TestResult";
 
 const drawerWidth = 240
 
@@ -67,6 +66,7 @@ export default function Home() {
   const { data: session, status } = useSession()
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
   const mainRef = useRef(null)
+  const valid = session?.user
   const email = session?.user?.email
   const [file, setFile] = useState(null)
   const [viewportWidth, setViewportWidth] = useState(0)
@@ -76,6 +76,7 @@ export default function Home() {
   const [resultGridScale, setResultGridScale] = useState(false)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
+  const [listItems, setListItems] = useState([])
 
   useEffect(() => {
     const handleResize = () => {
@@ -102,6 +103,26 @@ export default function Home() {
 
   }, [results])
 
+  const validateUser = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/auth/validate/${email}`, {
+        method: 'GET',
+      })
+
+      if (!res.ok) {
+        throw new Error(`${res.status} - ${res.statusText}`)
+      }
+
+      const response = await res.json()
+      const uuid = response.uuid
+
+      localStorage.setItem('uuid', uuid)
+    } catch (error) {
+      console.error(`Error occurred when logging in user: ${error}`)
+      openSnackbar({ message: 'Error signing in user', severity: 'error' })
+    }
+  }, [])
+
   useEffect(() => {
     if (status === 'authenticated') {
       const uuid = localStorage.getItem('uuid')
@@ -112,7 +133,32 @@ export default function Home() {
         return
       }
     }
-  }, [status])
+  }, [status, validateUser])
+
+  const fetchFirestoreAnalysis = useCallback(async () => {
+    try {
+      const uuid = localStorage.getItem('uuid')
+      const res = await fetch(`/api/fetchAnalysis/${uuid}`)
+
+      if (!res.ok) {
+        throw new Error(`${res.status} - ${res.statusText}`)
+      }
+
+      const data = await res.json()
+      setListItems(data)
+    } catch (error) {
+      console.error(`Error retrieving user's items from Firestore: ${error}`)
+      openSnackbar({ message: `Unable to retrieve your document analysis, please try again later`, severity: 'error' })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (valid) {
+      fetchFirestoreAnalysis()
+    } else {
+      setListItems([])
+    }
+  }, [valid, fetchFirestoreAnalysis])
 
   // useEffect(() => {
   //   const eventSource = new EventSource('/api/getFileData')
@@ -139,33 +185,8 @@ export default function Home() {
   //   }
   // }, [loading])
 
-  const validateUser = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/auth/validate/${email}`, {
-        method: 'GET',
-      })
-
-      if (!res.ok) {
-        throw new Error(`${res.status} - ${res.statusText}`)
-      }
-
-      const response = await res.json()
-      const uuid = response.uuid
-
-      localStorage.setItem('uuid', uuid)
-    } catch (error) {
-      console.error(`Error occurred when logging in user: ${error}`)
-      openSnackbar({ message: 'Error signing in user', severity: 'error' })
-    }
-  }, [email])
-
   const handleDrawer = () => {
     setDrawerOpen(!drawerOpen)
-  }
-
-  //Handle set results if in dev versus production
-  const handleSetResults = () => {
-    setResults((prevResults) => prevResults === null ? TestResult : null);
   }
 
   return (
@@ -208,12 +229,6 @@ export default function Home() {
                 >
                   Change Loading State
                 </Button>
-                <Button
-                  variant="contained"
-                  onClick={handleSetResults}
-                >
-                  Change Results State
-                </Button>
               </Box>
             )}
             <Fade
@@ -236,19 +251,21 @@ export default function Home() {
         handleDrawer={handleDrawer}
         drawerWidth={drawerWidth}
         viewportWidth={viewportWidth}
+        results={results}
         setResults={setResults}
-        openSnackbar={openSnackbar}
+        listItems={listItems}
+        setListItems={setListItems}
       />
 
       <Main
+        ref={mainRef}
         open={drawerOpen}
         viewportwidth={viewportWidth}
-        ref={mainRef}
       >
         <Fade
+          container={mainRef.current}
           in={!results}
           out={`${results !== null}`}
-          container={mainRef.current}
           mountOnEnter
           unmountOnExit
           style={{
@@ -267,8 +284,8 @@ export default function Home() {
           </div>
         </Fade>
         <Fade
-          in={results !== null}
           container={mainRef.current}
+          in={results !== null}
           mountOnEnter
           unmountOnExit
           timeout={{ enter: 300, exit: 0 }}
@@ -282,7 +299,6 @@ export default function Home() {
           <div>
             <Results
               results={results}
-              viewportWidth={viewportWidth}
               openSnackbar={openSnackbar}
               resultGridScale={resultGridScale}
             />
