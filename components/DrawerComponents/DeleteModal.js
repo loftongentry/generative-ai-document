@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, DialogActions, Button, Box } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, DialogActions, Button, Box, CircularProgress } from '@mui/material';
 import CustomSnackbar from "@/components/CustomSnackbar";
 import { useSnackbar } from "@/context/SnackbarContext";
 
 const DeleteModal = (props) => {
-  const { openDeleteModal, onClose, selectedItem, setSelectedItem } = props
+  const { openDeleteModal, onClose, selectedItem, setSelectedItem, fetchFirestoreAnalysis } = props
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
   const [loading, setLoading] = useState(false)
 
@@ -26,6 +26,7 @@ const DeleteModal = (props) => {
 
       setSelectedItem(null)
       onClose()
+      fetchFirestoreAnalysis()
     } catch (error) {
       console.error(`There was an error deleting document in google firestore: ${error}`)
       openSnackbar({ message: 'There was an error deleting your analysis, please try again', severity: 'error' })
@@ -51,6 +52,7 @@ const DeleteModal = (props) => {
           <Button
             variant="outlined"
             onClick={onClose}
+            disabled={loading}
           >
             Close
           </Button>
@@ -58,6 +60,7 @@ const DeleteModal = (props) => {
             variant="contained"
             color="error"
             onClick={handleDelete}
+            disabled={loading}
           >
             Delete
           </Button>
