@@ -2,6 +2,7 @@
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Why does the content shift over when the snackbar appears?
 //TODO: Different way of updating last login for user since it can be within the same API route
+//TODO: Change from firebase-admin-sdk to a firestore service account
 //TODO (MAYBE): Use "getServerSideProps" when fetching data (post authorization) from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
@@ -255,6 +256,7 @@ export default function Home() {
         setResults={setResults}
         listItems={listItems}
         setListItems={setListItems}
+        fetchFirestoreAnalysis={fetchFirestoreAnalysis}
       />
 
       <Main
