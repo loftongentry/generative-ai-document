@@ -3,7 +3,7 @@ export const runtime = 'nodejs'
 
 export const dynamic = 'force-dynamic'
 
-export default async function handler(req, res){
+export default async function handler(req, res) {
   let responseStream = new TransformStream()
   const writer = responseStream.writable.getWriter()
   const encoder = new TextEncoder()
