@@ -6,6 +6,7 @@ import { useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import SettingsModal from "./DrawerComponents/SettingsModal";
+import DeleteModal from "./DrawerComponents/DeleteModal"
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -14,49 +15,6 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
-const DeleteModal = (props) => {
-  const { open, onClose, selectedItem } = props
-
-  //Function to delete file analysis from firestore
-  //Close modal upon success and setSelectedItem to null
-  const handleDelete = async () => {
-    try {
-
-    } catch (error) {
-
-    }
-  }
-
-  return (
-    <Dialog
-      open={open}
-      maxWidth='sm'
-      fullWidth={true}
-    >
-      <DialogTitle>
-        Delete Analysis
-      </DialogTitle>
-      <DialogContent dividers>
-        This will delete the analysis for <b>{selectedItem?.name}</b>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          variant="outlined"
-          onClick={onClose}
-        >
-          Close
-        </Button>
-        <Button
-          variant="contained"
-          color="error"
-        >
-          Delete
-        </Button>
-      </DialogActions>
-    </Dialog>
-  )
-}
 
 const DefaultDrawer = (props) => {
   const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, listItems, setListItems } = props
@@ -339,9 +297,10 @@ const DefaultDrawer = (props) => {
         viewportWidth={viewportWidth}
       />
       <DeleteModal
-        open={deleteModal}
+        openDeleteModal={deleteModal}
         onClose={handleDeleteModalClose}
         selectedItem={selectedItem}
+        setSelectedItem={setSelectedItem}
       />
     </Drawer>
   )
