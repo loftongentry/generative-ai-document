@@ -1,0 +1,1 @@
+//TODO: API route to delete all documents with user's id
