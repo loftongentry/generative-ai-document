@@ -1,4 +1,4 @@
-//TODO: Need to test
+//TODO: Works with deleting item in firestore, but it won't increment the value in the userbase
 import { sequelize } from "@/database/db_def";
 import { User } from "@/database/models";
 import { firestore } from "@/lib/firestore";
@@ -23,9 +23,9 @@ export default async function handler(req, res) {
       throw new Error(`Error deleting document in firestore`)
     }
 
-    const userUpdate = await User.update(
+    await User.update(
       {
-        documents_deleted: sequelize.literal('documents_deleted + 1')
+        documentsDeleted: sequelize.literal('documents_deleted + 1')
       },
       {
         where: {
@@ -33,10 +33,6 @@ export default async function handler(req, res) {
         }
       }
     )
-
-    if (!userUpdate) {
-      throw new Error(`Error updating user base after document deletion`)
-    }
 
     return res.status(200).json({ success: true })
   } catch (error) {
