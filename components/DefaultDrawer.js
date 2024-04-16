@@ -1,6 +1,5 @@
 //TODO: Functionality for the options in the settings modal
 //TODO: Menu item only disappears for the item whose name is being changed
-//TODO: Don't set results to the value you've clicked on when editing the name
 //TODO: Pressing enter is the same as clicking out of the input box
 //TODO: If document that is selected's results are showing, then clear results, otherwise don't clear results
 import { useState } from "react";
@@ -69,11 +68,16 @@ const DefaultDrawer = (props) => {
     signOut()
   }
 
-  //Temp
   const handleChangeName = () => {
     setEditing(true)
     setEditedName(selectedItem.file_name)
     handleListItemMenuClose()
+  }
+
+  const handleSetResults = (item) => {
+    if (!editing) {
+      setResults(item)
+    }
   }
 
   const handleSaveEdit = async () => {
@@ -99,7 +103,7 @@ const DefaultDrawer = (props) => {
     } catch (error) {
       console.error(`There was an error updating document's name in google firestore: ${error}`)
       openSnackbar({ message: `There was an error updating your document's analysis, please try again later`, severity: 'error' })
-    } finally{
+    } finally {
       setLoading(false)
     }
   }
@@ -143,7 +147,7 @@ const DefaultDrawer = (props) => {
             borderRadius: '5px',
             gap: '5px'
           }}
-          disabled={!valid}
+          disabled={!valid || results === null}
           onClick={() => setResults(null)}
         >
           <InsertDriveFileIcon />
@@ -193,8 +197,9 @@ const DefaultDrawer = (props) => {
                 sx={{
                   borderRadius: '5px'
                 }}
-                onClick={() => setResults(item)}
+                onClick={() => handleSetResults(item)}
                 selected={results?.id === item?.id}
+                disableRipple={editing}
               >
                 {editing && selectedItem === item ? (
                   <Input
