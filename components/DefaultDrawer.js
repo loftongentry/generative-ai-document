@@ -1,7 +1,8 @@
 //TODO: Functionality for the options in the settings modal
+//TODO: Menu item only disappears for the item whose name is being changed
 //TODO: Don't set results to the value you've clicked on when editing the name
-//TODO: For each of the ListItems, the onBlur should send an API request to google cloud, which changes the name (should also make the mouse non-clickable and spinning logo)
-//NOTE: To get them to appear in order, have it sort the list of items based on last edited, and then by creation date (it that's possible)
+//TODO: Pressing enter is the same as clicking out of the input box
+//TODO: If document that is selected's results are showing, then clear results, otherwise don't clear results
 import { useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -17,7 +18,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const DefaultDrawer = (props) => {
-  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, listItems, setListItems, fetchFirestoreAnalysis } = props
+  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, listItems, setListItems, fetchFirestoreAnalysis, openSnackbar } = props
   const { data: session } = useSession()
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
@@ -28,6 +29,7 @@ const DefaultDrawer = (props) => {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [loading, setLoading] = useState(false)
   const valid = session?.user
 
   const handleProfileMenuOpen = (event) => {
@@ -68,28 +70,37 @@ const DefaultDrawer = (props) => {
   }
 
   //Temp
-  const handleListItem = (action) => {
-    if (action === 'Delete') {
-      const updatedList = listItems.filter(item => item.name !== selectedItem.name)
-      setListItems(updatedList)
-    } else if (action === 'Change Name') {
-      setEditing(true)
-      setEditedName(selectedItem.file_name)
-    }
-
+  const handleChangeName = () => {
+    setEditing(true)
+    setEditedName(selectedItem.file_name)
     handleListItemMenuClose()
   }
 
-  //Funtion to update name of file analysis in firestore
-  //onBlur should execute this function
-  //setSelectedItem to null upon success
   const handleSaveEdit = async () => {
-    try {
+    setLoading(true)
 
+    try {
+      const payload = JSON.stringify({
+        doc_id: selectedItem.id,
+        newName: editedName
+      })
+
+      const res = await fetch(`/api/firestore/update-name/${payload}`)
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+      }
+
+      setSelectedItem(null)
       setEditing(false)
       setEditedName('')
+      fetchFirestoreAnalysis()
     } catch (error) {
-
+      console.error(`There was an error updating document's name in google firestore: ${error}`)
+      openSnackbar({ message: `There was an error updating your document's analysis, please try again later`, severity: 'error' })
+    } finally{
+      setLoading(false)
     }
   }
 
@@ -169,11 +180,13 @@ const DefaultDrawer = (props) => {
                 marginBottom: index !== listItems.length - 1 ? '8px' : 0,
               }}
               secondaryAction={
-                <IconButton
-                  onClick={(event) => handleListItemMenuOpen(event, item)}
-                >
-                  <MoreVertIcon />
-                </IconButton>
+                (!editing && (
+                  <IconButton
+                    onClick={(event) => handleListItemMenuOpen(event, item)}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                ))
               }
             >
               <ListItemButton
@@ -214,7 +227,7 @@ const DefaultDrawer = (props) => {
         >
           <MenuList>
             <MenuItem
-              onClick={() => handleListItem('Change Name')}
+              onClick={handleChangeName}
             >
               <ListItemIcon>
                 <CreateIcon />
@@ -295,6 +308,8 @@ const DefaultDrawer = (props) => {
         settingsModalOpen={settingsModalOpen}
         handleSettingsModalClose={handleSettingsModalClose}
         viewportWidth={viewportWidth}
+        fetchFirestoreAnalysis={fetchFirestoreAnalysis}
+        openSnackbar={openSnackbar}
       />
       <DeleteModal
         openDeleteModal={deleteModal}
@@ -302,6 +317,7 @@ const DefaultDrawer = (props) => {
         selectedItem={selectedItem}
         setSelectedItem={setSelectedItem}
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
+        openSnackbar={openSnackbar}
       />
     </Drawer>
   )
