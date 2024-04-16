@@ -46,15 +46,15 @@ const Item = styled(Paper)(({ theme }) => ({
   margin: '5px',
   padding: '10px',
   maxHeight: '500px',
-  maxWidth: '300px',
+  maxWidth: theme.resultGridScale ? '' : '340px',
   overflow: 'hidden'
 }))
 
 const Results = forwardRef((props, ref) => {
-  const { results, openSnackbar, resultGridScale } = props
+  const { results, openSnackbar, theme } = props
   const [langExapanded, setLangExpanded] = useState(false)
   const [wordCountExapnded, setWordCountExpanded] = useState(false)
-
+  
   const getLangName = (langCode) => {
     if (languageMap.hasOwnProperty(langCode)) {
       return languageMap[langCode]
@@ -107,7 +107,7 @@ const Results = forwardRef((props, ref) => {
       >
         <Grid
           item
-          xs={resultGridScale ? 12 : 4}
+          xs={theme.resultGridScale ? 12 : 4}
         >
           <CustomToolbar
             toolbarName={'Analyzed Text'}
@@ -135,7 +135,7 @@ const Results = forwardRef((props, ref) => {
         </Grid>
         <Grid
           item
-          xs={resultGridScale ? 12 : 4}
+          xs={theme.resultGridScale ? 12 : 4}
         >
           <CustomToolbar
             toolbarName={'Document Summary'}
@@ -163,7 +163,7 @@ const Results = forwardRef((props, ref) => {
         </Grid>
         <Grid
           item
-          xs={resultGridScale ? 12 : 4}
+          xs={theme.resultGridScale ? 12 : 4}
         >
           <Item>
             <Stack
