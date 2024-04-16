@@ -4,7 +4,7 @@
 //TODO: If document that is selected's results are showing, then clear results, otherwise don't clear results
 //TODO: If name is unchanged, then don't call API route
 import { useState } from "react";
-import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button, TextField } from '@mui/material';
+import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import SettingsModal from "./DrawerComponents/SettingsModal";
 import DeleteModal from "./DrawerComponents/DeleteModal"
