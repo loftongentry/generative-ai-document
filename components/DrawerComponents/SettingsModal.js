@@ -6,12 +6,41 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 
 const SettingsModal = (props) => {
-  const { settingsModalOpen, handleSettingsModalClose, viewportWidth } = props
+  const { settingsModalOpen, handleSettingsModalClose, viewportWidth, fetchFirestoreAnalysis } = props
   const [selectedSetting, setSelectedSetting] = useState(0)
   const [feedback, setFeedback] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async () => {
+    setLoading(true)
+
+    try {
+
+    } catch (error) {
+
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  //Need another confirmation modal if deleting all analysis
+  const handleDeleteAnalysis = async () => {
+    setLoading(true)
+
+    try {
+
+    } catch (error) {
+
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  //Need to sign out user after account deletion
+  //Need another confirmation modal if deleting entire account
+  const handleDeleteAccount = async () => {
+    setLoading(true)
+
     try {
 
     } catch (error) {
@@ -171,7 +200,7 @@ const SettingsModal = (props) => {
                 minWidth: '180px',
               }}
             >
-             {loading ? <CircularProgress size={24} /> : 'Submit Feedback'}
+              {loading ? <CircularProgress size={24} /> : 'Submit Feedback'}
             </Button>
           </Box>
         </TabPanel>
