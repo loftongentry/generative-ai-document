@@ -1,3 +1,4 @@
+//NOTE: Because of the simplcity of the web app, I didn't need to place the snackbar error within it's own context, but I wanted to practice using contexts further
 import { createContext, useContext, useState } from "react"
 
 export const SnackbarContext = createContext()
