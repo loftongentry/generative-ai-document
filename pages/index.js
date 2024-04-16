@@ -111,7 +111,8 @@ export default function Home() {
       })
 
       if (!res.ok) {
-        throw new Error(`${res.status} - ${res.statusText}`)
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
       }
 
       const response = await res.json()
@@ -142,7 +143,8 @@ export default function Home() {
       const res = await fetch(`/api/fetchAnalysis/${uuid}`)
 
       if (!res.ok) {
-        throw new Error(`${res.status} - ${res.statusText}`)
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
       }
 
       const data = await res.json()
@@ -257,6 +259,7 @@ export default function Home() {
         listItems={listItems}
         setListItems={setListItems}
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
+        openSnackbar={openSnackbar}
       />
 
       <Main

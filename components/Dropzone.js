@@ -133,7 +133,8 @@ const Dropzone = forwardRef((props, ref) => {
       })
 
       if (!res.ok) {
-        throw new Error(`${res.status} - ${res.statusText}`)
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
       }
 
       URL.revokeObjectURL(file.preview)
@@ -141,6 +142,7 @@ const Dropzone = forwardRef((props, ref) => {
     } catch (error) {
       console.error(`Error uploading document to google cloud: ${error}`)
       openSnackbar({ message: 'There was an error uploading your document, please try again later', severity: 'error' })
+    } finally{
       setLoading(false)
     }
   }
