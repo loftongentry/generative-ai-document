@@ -2,8 +2,9 @@
 //TODO: Menu item only disappears for the item whose name is being changed
 //TODO: Pressing enter is the same as clicking out of the input box
 //TODO: If document that is selected's results are showing, then clear results, otherwise don't clear results
+//TODO: If name is unchanged, then don't call API route
 import { useState } from "react";
-import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
+import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline, Dialog, DialogContent, DialogTitle, DialogActions, Button, TextField } from '@mui/material';
 import { useSession, signIn, signOut } from "next-auth/react";
 import SettingsModal from "./DrawerComponents/SettingsModal";
 import DeleteModal from "./DrawerComponents/DeleteModal"
@@ -203,10 +204,17 @@ const DefaultDrawer = (props) => {
               >
                 {editing && selectedItem === item ? (
                   <Input
-                    focus='true'
                     value={editedName}
                     onChange={(e) => setEditedName(e.target.value)}
                     onBlur={handleSaveEdit}
+                    disableUnderline
+                    size={"small"}
+                    sx={{
+                      '& .MuiInput-input': {
+                        paddingTop: '0px',
+                        paddingBottom: '0px'
+                      }
+                    }}
                   />
                 ) : (
                   <Typography noWrap>
