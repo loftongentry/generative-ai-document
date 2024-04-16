@@ -1,11 +1,8 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogActions, Button, Box, CircularProgress } from '@mui/material';
-import CustomSnackbar from "@/components/CustomSnackbar";
-import { useSnackbar } from "@/context/SnackbarContext";
 
 const DeleteModal = (props) => {
-  const { openDeleteModal, onClose, selectedItem, setSelectedItem, fetchFirestoreAnalysis } = props
-  const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
+  const { openDeleteModal, onClose, selectedItem, setSelectedItem, fetchFirestoreAnalysis, openSnackbar } = props
   const [loading, setLoading] = useState(false)
 
   const handleDelete = async () => {
@@ -21,7 +18,8 @@ const DeleteModal = (props) => {
       const res = await fetch(`/api/firestore/delete-doc/${payload}`)
 
       if (!res.ok) {
-        throw new Error(`${res.status} - ${res.statusText}`)
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
       }
 
       setSelectedItem(null)
@@ -29,50 +27,42 @@ const DeleteModal = (props) => {
       fetchFirestoreAnalysis()
     } catch (error) {
       console.error(`There was an error deleting document in google firestore: ${error}`)
-      openSnackbar({ message: 'There was an error deleting your analysis, please try again', severity: 'error' })
+      openSnackbar({ message: 'There was an error deleting your analysis, please try again later', severity: 'error' })
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <Box>
-      <Dialog
-        open={openDeleteModal}
-        maxWidth='sm'
-        fullWidth={true}
-      >
-        <DialogTitle>
-          Delete Analysis
-        </DialogTitle>
-        <DialogContent dividers>
-          This will delete the analysis for <b>{selectedItem?.name}</b>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="outlined"
-            onClick={onClose}
-            disabled={loading}
-          >
-            Close
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleDelete}
-            disabled={loading}
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <CustomSnackbar
-        open={open}
-        onClose={closeSnackbar}
-        message={message}
-        severity={severity}
-      />
-    </Box>
+    <Dialog
+      open={openDeleteModal}
+      maxWidth='sm'
+      fullWidth={true}
+    >
+      <DialogTitle>
+        Delete Analysis
+      </DialogTitle>
+      <DialogContent dividers>
+        This will delete the analysis for <b>{selectedItem?.name}</b>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="outlined"
+          onClick={onClose}
+          disabled={loading}
+        >
+          Close
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleDelete}
+          disabled={loading}
+        >
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 
