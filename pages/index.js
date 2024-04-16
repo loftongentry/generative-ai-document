@@ -3,11 +3,12 @@
 //TODO: Why does the content shift over when the snackbar appears?
 //TODO: Different way of updating last login for user since it can be within the same API route
 //TODO: Change from firebase-admin-sdk to a firestore service account
+//TODO: Review over how the useCallbacks and useEffects are being handled
 //TODO (MAYBE): Use "getServerSideProps" when fetching data (post authorization) from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Box, Button, Fade, IconButton, Toolbar } from "@mui/material";
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
 import DefaultDrawer from "@/components/DefaultDrawer";
@@ -67,14 +68,12 @@ export default function Home() {
   const { data: session, status } = useSession()
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
   const mainRef = useRef(null)
+  const theme = useTheme()
   const valid = session?.user
   const email = session?.user?.email
   const [file, setFile] = useState(null)
   const [viewportWidth, setViewportWidth] = useState(0)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [dropzoneScale, setDropzoneScale] = useState(false)
-  const [resultsScale, setResultsScale] = useState(false)
-  const [resultGridScale, setResultGridScale] = useState(false)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
   const [listItems, setListItems] = useState([])
@@ -84,9 +83,10 @@ export default function Home() {
       const width = window.innerWidth
       setViewportWidth(width)
 
-      setResultsScale(width <= 768)
-      setDropzoneScale(width <= 425)
-      setResultGridScale(width <= 425)
+      theme.resultsScale = width <= 768
+      theme.dropzoneScale = width <= 425
+      theme.resultGridScale = width <= 425
+      theme.palette = { ...theme.palette }
       if ((width <= 1024 && results) || width <= 425) {
         setDrawerOpen(false)
       } else if (width > 425 && !results) {
@@ -275,7 +275,7 @@ export default function Home() {
           unmountOnExit
           style={{
             position: 'relative',
-            transform: dropzoneScale ? 'scale(0.8)' : 'none'
+            transform: theme.dropzoneScale ? 'scale(0.8)' : 'none'
           }}
         >
           <div>
@@ -298,14 +298,14 @@ export default function Home() {
             transitionDelay: '250ms',
             position: 'absolute',
             zIndex: 1,
-            transform: resultsScale ? 'scale(0.8)' : 'none'
+            transform: theme.resultsScale ? 'scale(0.8)' : 'none'
           }}
         >
           <div>
             <Results
               results={results}
               openSnackbar={openSnackbar}
-              resultGridScale={resultGridScale}
+              theme={theme}
             />
           </div>
         </Fade>
