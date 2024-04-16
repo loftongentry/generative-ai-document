@@ -1,4 +1,3 @@
-//TODO: Remove documentIDs column, first used
 const { DataTypes } = require('sequelize')
 const { sequelize } = require('./db_def')
 
