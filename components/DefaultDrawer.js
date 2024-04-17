@@ -1,11 +1,9 @@
-//TODO: Functionality for the options in the settings modal
 //TODO: Menu item only disappears for the item whose name is being changed
 //TODO: Pressing enter is the same as clicking out of the input box
 //TODO: If document that is selected's results are showing, then clear results, otherwise don't clear results
-//TODO: If name is unchanged, then don't call API route
 import { useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline } from '@mui/material';
-import { useSession, signIn, signOut } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import SettingsModal from "./DrawerComponents/SettingsModal";
 import DeleteModal from "./DrawerComponents/DeleteModal"
 import LoginIcon from '@mui/icons-material/Login';
@@ -18,8 +16,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const DefaultDrawer = (props) => {
-  const { drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, listItems, fetchFirestoreAnalysis, openSnackbar } = props
-  const { data: session } = useSession()
+  const { session, drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, listItems, fetchFirestoreAnalysis, openSnackbar } = props
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [listItemAnchorEl, setListItemAnchorEl] = useState(null)
@@ -82,6 +79,12 @@ const DefaultDrawer = (props) => {
   }
 
   const handleSaveEdit = async () => {
+    //NOTE: This is to make sure there isn't an unnecessary call to firestore if the name hasn't been changed
+    if (selectedItem?.file_name === editedName) {
+      handleCleanUp()
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -97,9 +100,7 @@ const DefaultDrawer = (props) => {
         throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
       }
 
-      setSelectedItem(null)
-      setEditing(false)
-      setEditedName('')
+      handleCleanUp()
       fetchFirestoreAnalysis()
     } catch (error) {
       console.error(`There was an error updating document's name in google firestore: ${error}`)
@@ -116,6 +117,12 @@ const DefaultDrawer = (props) => {
 
   const handleSettingsModalClose = () => {
     setSettingsModalOpen(false)
+  }
+
+  const handleCleanUp = () => {
+    setSelectedItem(null)
+    setEditing(false)
+    setEditedName('')
   }
 
   return (
@@ -195,12 +202,13 @@ const DefaultDrawer = (props) => {
               }
             >
               <ListItemButton
-                sx={{
-                  borderRadius: '5px'
-                }}
                 onClick={() => handleSetResults(item)}
                 selected={results?.id === item?.id}
                 disableRipple={editing}
+                sx={{
+                  borderRadius: '5px',
+                  height: '39px'
+                }}
               >
                 {editing && selectedItem === item ? (
                   <Input
@@ -323,6 +331,7 @@ const DefaultDrawer = (props) => {
         viewportWidth={viewportWidth}
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
         openSnackbar={openSnackbar}
+        signOut={signOut}
       />
       <DeleteModal
         openDeleteModal={deleteModal}
