@@ -14,7 +14,6 @@ import BackupIcon from '@mui/icons-material/Backup';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DeleteForever from "@mui/icons-material/DeleteForever";
 import { Document, Page, pdfjs } from 'react-pdf';
-import { useSession } from "next-auth/react";
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -22,8 +21,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const maxSize = 1024 * 1024 * 5
 
 const Dropzone = forwardRef((props, ref) => {
-  const { data: session } = useSession()
-  const { file, setFile, openSnackbar, loading, setLoading } = props
+  const { session, file, setFile, openSnackbar, loading, setLoading } = props
   const valid = session?.user
 
   const onDrop = useCallback(acceptedFiles => {
