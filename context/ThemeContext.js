@@ -9,7 +9,6 @@ export const ThemeModeProvider = ({ children }) => {
   //Check system preference for dark mode
   const isDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [mode, setMode] = useState('light')
-  const [dropzoneScale, setDropzoneScale] = useState(false)
   const [resultsScale, setResultsScale] = useState(false)
   const [resultGridScale, setResultGridScale] = useState(false)
 
@@ -33,7 +32,6 @@ export const ThemeModeProvider = ({ children }) => {
       palette: {
         mode: mode === 'dark' || (mode === 'auto' && isDarkMode) ? 'dark' : 'light'
       },
-      dropzoneScale: dropzoneScale,
       resultsScale: resultsScale,
       resultGridScale: resultGridScale
     })

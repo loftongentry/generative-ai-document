@@ -74,17 +74,20 @@ export default function Home() {
   const [file, setFile] = useState(null)
   const [viewportWidth, setViewportWidth] = useState(0)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [dropzoneScale, setDropzoneScale] = useState(false)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
   const [listItems, setListItems] = useState([])
 
+  //NOTE: Have to use useState instead of theme object because the component was rendering/mounting before the theme object had chance to change based on screen width
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth
       setViewportWidth(width)
 
+      setDropzoneScale(width <= 425)
+
       theme.resultsScale = width <= 768
-      theme.dropzoneScale = width <= 425
       theme.resultGridScale = width <= 425
       theme.palette = { ...theme.palette }
       if ((width <= 1024 && results) || width <= 425) {
@@ -140,7 +143,7 @@ export default function Home() {
   const fetchFirestoreAnalysis = useCallback(async () => {
     try {
       const uuid = localStorage.getItem('uuid')
-      const res = await fetch(`/api/fetchAnalysis/${uuid}`)
+      const res = await fetch(`/api/fetch-analysis/${uuid}`)
 
       if (!res.ok) {
         const data = await res.json()
@@ -250,6 +253,7 @@ export default function Home() {
       </AppBar>
 
       <DefaultDrawer
+        session={session}
         drawerOpen={drawerOpen}
         handleDrawer={handleDrawer}
         drawerWidth={drawerWidth}
@@ -275,11 +279,12 @@ export default function Home() {
           unmountOnExit
           style={{
             position: 'relative',
-            transform: theme.dropzoneScale ? 'scale(0.8)' : 'none'
+            transform: dropzoneScale ? 'scale(0.8)' : 'none'
           }}
         >
           <div>
             <Dropzone
+              session={session}
               file={file}
               setFile={setFile}
               openSnackbar={openSnackbar}
