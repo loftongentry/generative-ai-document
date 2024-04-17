@@ -1,15 +1,25 @@
+//TODO: Add the actual functionality of the different buttons
 import { useState } from "react";
-import { Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material"
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material"
 import { ThemeSelector } from "@/context/ThemeContext";
 import CloseIcon from '@mui/icons-material/Close';
 import SettingsIcon from '@mui/icons-material/Settings';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 
 const SettingsModal = (props) => {
-  const { settingsModalOpen, handleSettingsModalClose, viewportWidth, fetchFirestoreAnalysis } = props
+  const { settingsModalOpen, handleSettingsModalClose, viewportWidth, fetchFirestoreAnalysis, openSnackbar, signOut } = props
   const [selectedSetting, setSelectedSetting] = useState(0)
   const [feedback, setFeedback] = useState('')
+  const [confirmModal, setConfirmModal] = useState(false)
+  const [modalType, setModalType] = useState('')
   const [loading, setLoading] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
+  const uuid = localStorage.getItem('uuid')
+
+  const handleOpenConfirmModal = (action) => {
+    setConfirmModal(true)
+    setModalType(action)
+  }
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -23,30 +33,45 @@ const SettingsModal = (props) => {
     }
   }
 
-  //Need another confirmation modal if deleting all analysis
   const handleDeleteAnalysis = async () => {
-    setLoading(true)
+    setModalLoading(true)
 
     try {
+      const res = await fetch(`/api/firestore/delete-all/${uuid}`)
 
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+      }
+
+      setConfirmModal(false)
+      fetchFirestoreAnalysis()
     } catch (error) {
-
+      console.error(`There was an error deleting the documents for account: ${uuid}: ${error}`)
+      openSnackbar({ message: 'There was an error deleting all of your analysis, please try again later', severity: 'error' })
     } finally {
-      setLoading(false)
+      setModalLoading(false)
     }
   }
 
-  //Need to sign out user after account deletion
-  //Need another confirmation modal if deleting entire account
   const handleDeleteAccount = async () => {
-    setLoading(true)
+    setModalLoading(true)
 
     try {
+      const res = await fetch(`/api/auth/delete-account/${uuid}`)
 
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+      }
+
+      setConfirmModal(false)
+      signOut()
     } catch (error) {
-
+      console.error(`There was an error deleting the account: ${uuid}: ${error}`)
+      openSnackbar({ message: 'There was an error deleting your account, please try again later', severity: 'error' })
     } finally {
-      setLoading(false)
+      setModalLoading(false)
     }
   }
 
@@ -147,6 +172,7 @@ const SettingsModal = (props) => {
                 variant="outlined"
                 color='error'
                 size="small"
+                onClick={() => handleOpenConfirmModal('Delete Analysis')}
               >
                 Delete All
               </Button>
@@ -167,6 +193,7 @@ const SettingsModal = (props) => {
                 variant="contained"
                 color="error"
                 size="small"
+                onClick={() => handleOpenConfirmModal('Delete Account')}
               >
                 Delete Account
               </Button>
@@ -205,6 +232,50 @@ const SettingsModal = (props) => {
           </Box>
         </TabPanel>
       </DialogContent>
+      <Dialog open={confirmModal}>
+        <DialogContent
+          sx={{
+            height: '80px',
+            width: '350px',
+            overflow: 'hidden'
+          }}
+        >
+          <Typography>
+            {modalLoading ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <CircularProgress />
+              </Box>
+            ) : (
+              modalType === 'Delete Analysis' ? 'Are you sure you want to delete all analysis data?' : 'Are you sure you want to delete your account?'
+            )}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={() => setConfirmModal(false)}
+            disabled={modalLoading}
+          >
+            Close
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              modalType === 'Delete Analysis' ? handleDeleteAnalysis() : handleDeleteAccount()
+            }}
+            disabled={modalLoading}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   )
 }
