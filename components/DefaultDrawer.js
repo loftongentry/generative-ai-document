@@ -16,7 +16,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const DefaultDrawer = (props) => {
-  const { session, drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, listItems, fetchFirestoreAnalysis, openSnackbar } = props
+  const { session, drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, listItems, setListItems, fetchFirestoreAnalysis, openSnackbar } = props
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [listItemAnchorEl, setListItemAnchorEl] = useState(null)
@@ -332,6 +332,7 @@ const DefaultDrawer = (props) => {
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
         openSnackbar={openSnackbar}
         signOut={signOut}
+        setListItems={setListItems}
       />
       <DeleteModal
         openDeleteModal={deleteModal}
