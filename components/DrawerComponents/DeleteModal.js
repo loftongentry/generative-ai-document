@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, DialogActions, Button, Box, CircularProgress } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
 
 const DeleteModal = (props) => {
   const { openDeleteModal, onClose, selectedItem, setSelectedItem, fetchFirestoreAnalysis, openSnackbar } = props
