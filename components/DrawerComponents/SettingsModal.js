@@ -7,7 +7,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 
 const SettingsModal = (props) => {
-  const { settingsModalOpen, handleSettingsModalClose, viewportWidth, fetchFirestoreAnalysis, openSnackbar, signOut } = props
+  const { settingsModalOpen, handleSettingsModalClose, viewportWidth, fetchFirestoreAnalysis, openSnackbar, signOut, setListItems } = props
   const [selectedSetting, setSelectedSetting] = useState(0)
   const [feedback, setFeedback] = useState('')
   const [confirmModal, setConfirmModal] = useState(false)
@@ -66,6 +66,7 @@ const SettingsModal = (props) => {
       }
 
       setConfirmModal(false)
+      setListItems(null)
       signOut()
     } catch (error) {
       console.error(`There was an error deleting the account: ${uuid}: ${error}`)
