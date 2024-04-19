@@ -281,7 +281,7 @@ const DefaultDrawer = (props) => {
             />
           </IconButton>
           <Typography>
-            {session?.user?.name}
+            {session === null ? 'Please Login Here' : session?.user?.name}
           </Typography>
         </Toolbar>
         <Popover
