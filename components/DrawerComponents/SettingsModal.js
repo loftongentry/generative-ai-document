@@ -9,6 +9,7 @@ import FeedbackIcon from '@mui/icons-material/Feedback';
 const SettingsModal = (props) => {
   const { settingsModalOpen, handleSettingsModalClose, viewportWidth, fetchFirestoreAnalysis, openSnackbar, signOut, setListItems } = props
   const [selectedSetting, setSelectedSetting] = useState(0)
+  const [subject, setSubject] = useState('')
   const [feedback, setFeedback] = useState('')
   const [confirmModal, setConfirmModal] = useState(false)
   const [modalType, setModalType] = useState('')
@@ -209,14 +210,18 @@ const SettingsModal = (props) => {
             }}
           >
             <TextField
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              label='Subject'
+              fullWidth
+            />
+            <TextField
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               label='Feedback'
               multiline
               rows={4}
-              sx={{
-                width: '100%'
-              }}
+              fullWidth
             />
             <Button
               variant='contained'
