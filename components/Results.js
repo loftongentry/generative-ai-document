@@ -1,8 +1,6 @@
-//TODO: Make sure that the image is not being hidden by the App Bar when not in viewing in mobile
-//TODO: Clicking on the block with the doc text or the doc summary, opens a modal (or something) so it's easier to read for end user to digest
-//TODO: If document is a PDF, then it's displayed as a PDF displayer. (PNG/JPG/JPEG need to be smaller)
-//TODO: Displaying the analyzed document at the proper ratio of height to width
-//TODO: Making sure if in mobile it's displaying results at proper orientation
+//TODO: Make sure that the image is not being hidden by the App Bar when viewing
+//TODO: If document is a PDF, then it's displayed in PDF displayer. (PNG/JPG/JPEG need to be smaller)
+//TODO: Displaying the analyzed document at the proper ratio of height to width (only in desktop mode)
 import { forwardRef, useState } from "react"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, IconButton, Paper, Stack, Typography, Toolbar, styled, Tooltip } from "@mui/material"
 import Image from "next/image"
