@@ -1,4 +1,4 @@
-//TODO: Make sure that the image is not being hidden by the App Bar when not in desktop mode
+//TODO: Make sure that the image is not being hidden by the App Bar when not in viewing in mobile
 //TODO: Clicking on the block with the doc text or the doc summary, opens a modal (or something) so it's easier to read for end user to digest
 //TODO: If document is a PDF, then it's displayed as a PDF displayer. (PNG/JPG/JPEG need to be smaller)
 //TODO: Displaying the analyzed document at the proper ratio of height to width
@@ -51,10 +51,10 @@ const Item = styled(Paper)(({ theme }) => ({
 }))
 
 const Results = forwardRef((props, ref) => {
-  const { results, openSnackbar, theme } = props
+  const { results, openSnackbar, theme, viewportWidth } = props
   const [langExapanded, setLangExpanded] = useState(false)
   const [wordCountExapnded, setWordCountExpanded] = useState(false)
-  
+
   const getLangName = (langCode) => {
     if (languageMap.hasOwnProperty(langCode)) {
       return languageMap[langCode]
@@ -88,19 +88,28 @@ const Results = forwardRef((props, ref) => {
       spacing={1}
       ref={ref}
     >
-      <Box>
-        <Item>
-          <Image
-            src={results?.doc_image || ''}
-            alt='Analyzed Document'
-            style={{
-              //maxHeight: '100%',
-              maxWidth: '100%'
+      {viewportWidth > 425 && (
+        <>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center'
             }}
-          />
-        </Item>
-      </Box>
-      <Divider />
+          >
+            <Item>
+              <Image
+                src={results?.doc_image || ''}
+                alt='Analyzed Document'
+                style={{
+                  //maxHeight: '100%',
+                  maxWidth: '100%'
+                }}
+              />
+            </Item>
+          </Box>
+          <Divider />
+        </>
+      )}
       <Grid
         container
         sx={{ flexGrow: 1 }}
