@@ -65,8 +65,6 @@ const SettingsModal = (props) => {
         throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
       }
 
-      setConfirmModal(false)
-      setListItems(null)
       signOut()
     } catch (error) {
       console.error(`There was an error deleting the account: ${uuid}: ${error}`)
