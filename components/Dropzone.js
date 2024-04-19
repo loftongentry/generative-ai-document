@@ -140,7 +140,7 @@ const Dropzone = forwardRef((props, ref) => {
     } catch (error) {
       console.error(`Error uploading document to google cloud: ${error}`)
       openSnackbar({ message: 'There was an error uploading your document, please try again later', severity: 'error' })
-    } finally{
+    } finally {
       setLoading(false)
     }
   }
@@ -154,6 +154,11 @@ const Dropzone = forwardRef((props, ref) => {
         alignItems: 'center',
       }}
       ref={ref}
+      onClick={() => {
+        if (session === null) {
+          openSnackbar({ message: 'You must be logged in before attempting to upload a document for analysis', severity: 'error' })
+        }
+      }}
     >
       <IconButton
         {...getRootProps({})}
