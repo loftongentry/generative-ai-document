@@ -1,6 +1,6 @@
-//TODO: Need to test
+//TODO: Need to test to make sure it deletes documents
 import { User } from "@/database/models";
-import { firestore } from "googleapis/build/src/apis/firestore"
+import { firestore } from "@/lib/firestore";
 import { getToken } from "next-auth/jwt"
 
 const collection = process.env.NODE_ENV === 'development' ? 'Testing Storage' : ''
