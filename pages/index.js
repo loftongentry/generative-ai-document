@@ -1,6 +1,7 @@
-//TODO: Handling retrieving new analysis data using SSE
+//TODO: Snackbar keep shifting items around. Need to review that
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Different way of updating last login for user since it can be within the same API route
+//TODO: Handling retrieving new analysis data using SSE
 //TODO: Review over how the useCallbacks and useEffects are being handled
 //TODO (MAYBE): Use "getServerSideProps" when fetching data (post authorization) from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 import { useEffect, useState, useCallback, useRef } from "react";
