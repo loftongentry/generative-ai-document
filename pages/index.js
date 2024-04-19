@@ -20,18 +20,18 @@ import { useSnackbar } from "@/context/SnackbarContext";
 const drawerWidth = 240
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open, viewportwidth }) => ({
-    height: '100vh',
+  ({ theme, open, width, height }) => ({
+    height: `calc(${height}px - 64px)`,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     flexGrow: 1,
-    padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+    marginTop: `64px`,
     marginLeft: `-${drawerWidth}px`,
     ...(open && {
       transition: theme.transitions.create('margin', {
@@ -40,7 +40,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       }),
       marginLeft: 0,
     }),
-    ...(viewportwidth < 768 && {
+    ...(width < 768 && {
       marginLeft: 0,
     }),
     overflow: 'hidden'
@@ -73,6 +73,7 @@ export default function Home() {
   const email = session?.user?.email
   const [file, setFile] = useState(null)
   const [viewportWidth, setViewportWidth] = useState(0)
+  const [viewportHeight, setViewportHeight] = useState(0)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [dropzoneScale, setDropzoneScale] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -83,7 +84,9 @@ export default function Home() {
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth
+      const height = window.innerHeight
       setViewportWidth(width)
+      setViewportHeight(height)
 
       setDropzoneScale(width <= 425)
 
@@ -269,7 +272,8 @@ export default function Home() {
       <Main
         ref={mainRef}
         open={drawerOpen}
-        viewportwidth={viewportWidth}
+        width={viewportWidth}
+        height={viewportHeight}
       >
         <Fade
           container={mainRef.current}
@@ -311,6 +315,7 @@ export default function Home() {
               results={results}
               openSnackbar={openSnackbar}
               theme={theme}
+              viewportWidth={viewportWidth}
             />
           </div>
         </Fade>
