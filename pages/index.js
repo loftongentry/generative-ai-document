@@ -1,13 +1,11 @@
-//TODO: Handling use SSE
+//TODO: Handling retrieving new analysis data using SSE
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
-//TODO: Why does the content shift over when the snackbar appears?
 //TODO: Different way of updating last login for user since it can be within the same API route
-//TODO: Change from firebase-admin-sdk to a firestore service account
 //TODO: Review over how the useCallbacks and useEffects are being handled
 //TODO (MAYBE): Use "getServerSideProps" when fetching data (post authorization) from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Box, Button, Fade, IconButton, Toolbar } from "@mui/material";
+import { Box, Button, Fade, IconButton, Toolbar, Tooltip } from "@mui/material";
 import { styled, useTheme } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -110,6 +108,7 @@ export default function Home() {
 
   }, [results])
 
+  //TODO: Gotta make sure this doesn't execute before there's an email
   const validateUser = useCallback(async () => {
     try {
       const res = await fetch(`/api/auth/validate/${email}`, {
@@ -211,14 +210,20 @@ export default function Home() {
             justifyContent: 'space-between'
           }}
         >
-          <IconButton
-            onClick={handleDrawer}
-            color="inherit"
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: 'none' }) }}
+          <Tooltip
+            open={session === null}
+            title={(!drawerOpen && session === null) ? 'Please login before attempting to upload a document' : ''}
+            placement="right"
           >
-            <MenuIcon />
-          </IconButton>
+            <IconButton
+              onClick={handleDrawer}
+              color="inherit"
+              edge="start"
+              sx={{ mr: 2, ...(open && { display: 'none' }) }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Tooltip>
           <Box
             sx={{
               display: 'flex',
