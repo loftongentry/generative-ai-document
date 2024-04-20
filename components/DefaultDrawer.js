@@ -1,5 +1,7 @@
 //TODO: Menu item only disappears for the item whose name is being changed
 //TODO: Pressing enter is the same as clicking out of the input box
+//TODO: When going to edit name of document list item, highlight list item's current name
+//TODO: Make sure that the menu item hover isn't covering part of the name
 //TODO: If document that is selected's results are showing, then clear results, otherwise don't clear results
 import { useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline } from '@mui/material';
