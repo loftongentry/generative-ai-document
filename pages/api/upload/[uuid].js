@@ -1,5 +1,6 @@
 //TODO: Need to increment documents evaluated by 1, mark last used by current timestamp
-//TODO: Need to be properly returning API response
+//TODO: Need to be properly returning API response (too many asyncs? Check stack overflow answer)
+//TODO: Add comments explaining what's happening
 import { getToken } from 'next-auth/jwt';
 import formidable from 'formidable';
 import { createReadStream, unlink } from 'fs';
