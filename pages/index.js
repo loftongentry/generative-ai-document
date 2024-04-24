@@ -1,4 +1,4 @@
-//TODO: raise selectedItem prop to index, and have it passed down to the proper components to generate a signed url for results page
+//TODO: Generate signed url here if results is selected (need prop for generate url to be passed down results component)
 //TODO: Snackbar keep shifting items around. Need to review that
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Different way of updating last login for user since it can be within the same API route
