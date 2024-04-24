@@ -1,12 +1,12 @@
 //TODO: Need to increment documents evaluated by 1, mark last used by current timestamp
 //TODO: Need to be properly returning API response
-import { Storage } from '@google-cloud/storage';
+import { getToken } from 'next-auth/jwt';
 import formidable from 'formidable';
 import { createReadStream, unlink } from 'fs';
+import { storage } from '@/lib/storage';
 import { getDate } from '@/lib/getDate';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import { getToken } from 'next-auth/jwt';
 
 dotenv.config({ path: '../../.env' });
 
@@ -19,25 +19,16 @@ export const config = {
 export default async function handler(req, res) {
   const { query: { uuid } } = req
   const token = await getToken({ req })
-  const key = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS.toString())
 
   if (!token) {
     return res.status(401).json({ error: 'User must be logged in to perform this action' })
   }
 
-  const storage = new Storage({
-    projectId: process.env.PROJECT_ID,
-    credentials: {
-      client_email: key.client_email,
-      private_key: key.private_key.replace(/\\n/g, '\n')
-    }
-  })
-
   const form = formidable({
     keepExtensions: true,
   })
 
-  form.parse(req, async (error, fields, files) => {
+  form.parse(req, (error, fields, files) => {
     const selectedFile = files.file[0];
     if (!selectedFile) {
       console.error('No file uploaded')
