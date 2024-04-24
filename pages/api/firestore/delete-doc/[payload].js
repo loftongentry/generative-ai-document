@@ -9,7 +9,6 @@ const collection = process.env.NODE_ENV === 'development' ? 'Testing Storage' : 
 export default async function handler(req, res) {
   const { query: { payload } } = req
   const { doc_id, uuid } = JSON.parse(payload)
-
   const token = await getToken({ req })
 
   if (!token) {
