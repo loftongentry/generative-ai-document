@@ -1,5 +1,4 @@
 //TODO: Need to increment documents evaluated by 1, mark last used by current timestamp
-//TODO: Need to be properly returning API response (too many asyncs? Check stack overflow answer)
 //TODO: Add comments explaining what's happening
 import { getToken } from 'next-auth/jwt';
 import formidable from 'formidable';
@@ -29,33 +28,27 @@ export default async function handler(req, res) {
     keepExtensions: true,
   })
 
-  form.parse(req, (error, fields, files) => {
-    const selectedFile = files.file[0];
-    if (!selectedFile) {
-      console.error('No file uploaded')
-      return res.status(400).json({ error: 'No file uploaded' })
-    }
+  const formPromise = await new Promise((resolve, reject) => {
+    form.parse(req, async (error, files) => {
+      if (error) {
+        reject(error)
+      }
 
-    const salt = crypto.randomBytes(16).toString('hex')
-    const hashedFilename = crypto.createHash('sha256').update(selectedFile.originalFilename + salt).digest('hex')
+      const selectedFile = files.file[0];
 
-    const bucket = storage.bucket(process.env.CLOUD_STORAGE_BUCKET_NAME)
-    const blob = bucket.file(hashedFilename)
+      const salt = crypto.randomBytes(16).toString('hex')
+      const hashedFilename = crypto.createHash('sha256').update(selectedFile.originalFilename + salt).digest('hex')
 
-    const blobStream = createReadStream(selectedFile.filepath)
-      .pipe(blob.createWriteStream({
-        resumable: false,
-        contentType: selectedFile.mimetype
-      }))
+      const bucket = storage.bucket(process.env.CLOUD_STORAGE_BUCKET_NAME)
+      const blob = bucket.file(hashedFilename)
 
-    blobStream.on('error', (error) => {
-      console.error(`Error uploading files to cloud storage: ${error}`)
-      cleanupStreams(blobStream, selectedFile.filepath)
-      return res.status(500).json({ error: 'Error uploading files to cloud storage' })
-    })
+      const blobStream = createReadStream(selectedFile.filepath)
+        .pipe(blob.createWriteStream({
+          resumable: false,
+          contentType: selectedFile.mimetype
+        }))
 
-    blobStream.on('finish', async () => {
-      try {
+      blobStream.on('finish', async () => {
         await blob.setMetadata({
           metadata: {
             UUID: uuid,
@@ -65,19 +58,13 @@ export default async function handler(req, res) {
         })
 
         cleanupStreams(blobStream, selectedFile.filepath)
-        return res.status(201).json({ message: `Uploaded the file successfully: ${selectedFile.newFilename}` })
-      } catch (error) {
-        console.error(`Error setting metadata: ${error}`)
-        cleanupStreams(blobStream, selectedFile.filepath)
-        return res.status(500).json({ error: 'Error setting metadata' })
-      }
-    })
+      })
 
-    form.on('error', (error) => {
-      console.error(`Form parsing error: ${error}`)
-      return res.status(500).json({ error: 'Form parsing error' })
+      resolve(blobStream)
     })
   })
+
+  return res.json(formPromise)
 }
 
 function cleanupStreams(stream, filepath) {
