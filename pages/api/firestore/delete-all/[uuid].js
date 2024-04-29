@@ -1,5 +1,4 @@
-//TODO: Need to test
-import { firestore } from "googleapis/build/src/apis/firestore"
+import { firestore } from "@/lib/firestore"
 import { getToken } from "next-auth/jwt"
 
 const collection = process.env.NODE_ENV === 'development' ? 'Testing Storage' : ''
