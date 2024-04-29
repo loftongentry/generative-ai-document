@@ -46,6 +46,7 @@ const SettingsModal = (props) => {
       }
 
       setConfirmModal(false)
+      handleSettingsModalClose()
       fetchFirestoreAnalysis()
     } catch (error) {
       console.error(`There was an error deleting the documents for account: ${uuid}: ${error}`)
