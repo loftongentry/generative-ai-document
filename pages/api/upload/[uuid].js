@@ -31,17 +31,17 @@ export default async function handler(req, res) {
   //NOTE: Need to use a promise here otherwise no response will be sent when parsing the form data
   try {
     const formPromise = await new Promise((resolve, reject) => {
-      form.parse(req, async (error, files) => {
+      form.parse(req, async (error, fields, files) => {
         if (error) {
-          reject({ status: 400, error: 'Bad Request: Error parsing form data' })
+          return reject({ status: 400, error: 'Error parsing form data' })
+        }
+
+        if (!files || !files.file || !files.file[0]) {
+          return reject({ status: 400, error: 'No file uploaded' });
         }
 
         const selectedFile = files.file[0]
         const filePath = selectedFile.filepath
-
-        if (!selectedFile) {
-          reject({ status: 404, error: 'File not found' })
-        }
 
         const salt = crypto.randomBytes(16).toString('hex')
         const hashedFilename = crypto.createHash('sha256').update(selectedFile.originalFilename + salt).digest('hex')
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
 
         blobStream.on('error', (error) => {
           cleanupStreams(blobStream, filePath)
-          reject({ status: 500, error: `Internal Server Error: Error with blobStream - ${error}` })
+          reject({ status: 500, error: `Error with blobStream - ${error}` })
         })
 
         blobStream.on('finish', async () => {
@@ -76,10 +76,10 @@ export default async function handler(req, res) {
       })
     })
 
-    return res.status(200).json(formPromise)
+    return res.json(formPromise)
   } catch (error) {
     const statusCode = error.status || 500
-    console.error(`Error submitting document to Cloud Storage: ${error}`)
+    console.error(`Error submitting document to Cloud Storage: ${error.error}`)
     return res.status(statusCode).json({ error: error.error || 'Internal Server Error' })
   }
 }
