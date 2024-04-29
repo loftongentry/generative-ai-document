@@ -1,9 +1,5 @@
-//TODO: Menu item only disappears for the item whose name is being changed
-//TODO: Pressing enter is the same as clicking out of the input box
-//TODO: When going to edit name of document list item, highlight list item's current name
-//TODO: Make sure that the menu item hover isn't covering part of the name
 //TODO: If document that is selected's results are showing, then clear results, otherwise don't clear results
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline } from '@mui/material';
 import { signIn, signOut } from "next-auth/react";
 import SettingsModal from "./DrawerComponents/SettingsModal";
@@ -30,6 +26,14 @@ const DefaultDrawer = (props) => {
   const [selectedItem, setSelectedItem] = useState(null)
   const [loading, setLoading] = useState(false)
   const valid = session?.user
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    if (editing && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [editing])
 
   const handleProfileMenuOpen = (event) => {
     setProfileMenuOpen(true)
@@ -214,11 +218,17 @@ const DefaultDrawer = (props) => {
               >
                 {editing && selectedItem === item ? (
                   <Input
+                    inputRef={inputRef}
                     value={editedName}
                     onChange={(e) => setEditedName(e.target.value)}
-                    onBlur={handleSaveEdit}
                     disableUnderline
                     size={"small"}
+                    onBlur={handleSaveEdit}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSaveEdit()
+                      }
+                    }}
                     sx={{
                       '& .MuiInput-input': {
                         paddingTop: '0px',
