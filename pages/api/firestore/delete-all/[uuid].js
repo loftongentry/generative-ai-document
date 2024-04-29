@@ -25,6 +25,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true })
   } catch (error) {
     console.error(`Error deleting all analysis for user with ID: ${uuid}: ${error}`)
-    return res.status(500).json({ error: 'Internal server error' })
+    return res.status(500).json({ error: 'Internal Server Error' })
   }
 }

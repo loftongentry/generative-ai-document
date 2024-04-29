@@ -23,6 +23,6 @@ export default async function handler(req, res) {
     return res.status(200).json(signedUrl)
   } catch (error) {
     console.error(`Error generating signed url for document with doc_name: ${doc_name}: ${error}`)
-    return res.status(500).json({ error: 'Internal server error' })
+    return res.status(500).json({ error: 'Internal Server Error' })
   }
 }

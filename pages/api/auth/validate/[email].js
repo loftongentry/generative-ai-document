@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ uuid: user.uuid })
     } catch (error) {
       console.error(`Error occurred when user logged in: ${error}`)
-      return res.status(500).json({ error: 'Internal server error' })
+      return res.status(500).json({ error: 'Internal Server Error' })
     }
   } else {
     return res.status(405).json({ error: 'Method not allowed' })

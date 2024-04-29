@@ -23,6 +23,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true })
   } catch (error) {
     console.error(`There was an error updating the 'file_name' field for document with id: ${doc_id}: ${error}`)
-    return res.status(500).json({ error: 'Internal server error' })
+    return res.status(500).json({ error: 'Internal Server Error' })
   }
 }
