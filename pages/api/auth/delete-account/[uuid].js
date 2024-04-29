@@ -1,4 +1,3 @@
-//TODO: Need to test to make sure it deletes documents
 import { User } from "@/database/models";
 import { firestore } from "@/lib/firestore";
 import { getToken } from "next-auth/jwt"
@@ -14,7 +13,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const querySnapshot = await firestore.collection(`${collection}`).where('user_uuid', '==', uuid).get()
+    const querySnapshot = await firestore.collection(collection).where('user_uuid', '==', uuid).get()
 
     const batch = firestore.batch()
 
