@@ -1,4 +1,3 @@
-//TODO: Need to increment documents evaluated by 1, mark last used by current timestamp
 //TODO: Add comments explaining what's happening
 import { getToken } from 'next-auth/jwt';
 import formidable from 'formidable';
@@ -7,6 +6,7 @@ import { storage } from '@/lib/storage';
 import { getDate } from '@/lib/getDate';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import { User } from '@/database/models';
 
 dotenv.config({ path: '../../.env' });
 
@@ -72,6 +72,25 @@ export default async function handler(req, res) {
           cleanupStreams(blobStream, filePath)
         })
 
+        //Updating the user in the userbase with the last time they used the web app, as well as incrementing the number of documents they've evaluated by 1
+        try {
+          const user = await User.findOne({
+            where: {
+              uuid: uuid
+            }
+          })
+
+          if (!user) {
+            throw new Error('User does not exist')
+          }
+
+          user.documentsEvaluated += 1
+          await user.save()
+          await user.update({ lastUsed: getDate() })
+        } catch (error) {
+          console.error(`Error updating user: ${error}`)
+        }
+
         resolve(blobStream)
       })
     })
@@ -84,7 +103,7 @@ export default async function handler(req, res) {
   }
 }
 
-function cleanupStreams(stream, filepath) {
+const cleanupStreams = (stream, filepath) => {
   if (stream) {
     stream.end()
   }
