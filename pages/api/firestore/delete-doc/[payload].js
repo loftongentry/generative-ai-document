@@ -1,5 +1,3 @@
-//TODO: Works with deleting item in firestore, but it won't increment the value in the userbase
-import { sequelize } from "@/database/db_def";
 import { User } from "@/database/models";
 import { firestore } from "@/lib/firestore";
 import { getToken } from "next-auth/jwt";
@@ -22,16 +20,18 @@ export default async function handler(req, res) {
       throw new Error(`Error deleting document in firestore`)
     }
 
-    await User.update(
-      {
-        documentsDeleted: sequelize.literal('documents_deleted + 1')
-      },
-      {
-        where: {
-          uuid: uuid
-        }
+    const user = await User.findOne({
+      where: {
+        uuid: uuid
       }
-    )
+    })
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    user.documentsDeleted += 1
+    await user.save()
 
     return res.status(200).json({ success: true })
   } catch (error) {
