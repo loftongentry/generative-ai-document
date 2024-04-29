@@ -28,43 +28,60 @@ export default async function handler(req, res) {
     keepExtensions: true,
   })
 
-  const formPromise = await new Promise((resolve, reject) => {
-    form.parse(req, async (error, files) => {
-      if (error) {
-        reject(error)
-      }
+  //NOTE: Need to use a promise here otherwise no response will be sent when parsing the form data
+  try {
+    const formPromise = await new Promise((resolve, reject) => {
+      form.parse(req, async (error, files) => {
+        if (error) {
+          reject({ status: 400, error: 'Bad Request: Error parsing form data' })
+        }
 
-      const selectedFile = files.file[0];
+        const selectedFile = files.file[0]
+        const filePath = selectedFile.filepath
 
-      const salt = crypto.randomBytes(16).toString('hex')
-      const hashedFilename = crypto.createHash('sha256').update(selectedFile.originalFilename + salt).digest('hex')
+        if (!selectedFile) {
+          reject({ status: 404, error: 'File not found' })
+        }
 
-      const bucket = storage.bucket(process.env.CLOUD_STORAGE_BUCKET_NAME)
-      const blob = bucket.file(hashedFilename)
+        const salt = crypto.randomBytes(16).toString('hex')
+        const hashedFilename = crypto.createHash('sha256').update(selectedFile.originalFilename + salt).digest('hex')
 
-      const blobStream = createReadStream(selectedFile.filepath)
-        .pipe(blob.createWriteStream({
-          resumable: false,
-          contentType: selectedFile.mimetype
-        }))
+        const bucket = storage.bucket(process.env.CLOUD_STORAGE_BUCKET_NAME)
+        const blob = bucket.file(hashedFilename)
 
-      blobStream.on('finish', async () => {
-        await blob.setMetadata({
-          metadata: {
-            UUID: uuid,
-            FILE_NAME: selectedFile.originalFilename,
-            CREATION_DATE: getDate(),
-          }
+        const blobStream = createReadStream(filePath)
+          .pipe(blob.createWriteStream({
+            resumable: false,
+            contentType: selectedFile.mimetype
+          }))
+
+        blobStream.on('error', (error) => {
+          cleanupStreams(blobStream, filePath)
+          reject({ status: 500, error: `Internal Server Error: Error with blobStream - ${error}` })
         })
 
-        cleanupStreams(blobStream, selectedFile.filepath)
+        blobStream.on('finish', async () => {
+          await blob.setMetadata({
+            metadata: {
+              UUID: uuid,
+              FILE_NAME: selectedFile.originalFilename,
+              CREATION_DATE: getDate(),
+            }
+          })
+
+          cleanupStreams(blobStream, filePath)
+        })
+
+        resolve(blobStream)
       })
-
-      resolve(blobStream)
     })
-  })
 
-  return res.json(formPromise)
+    return res.status(200).json(formPromise)
+  } catch (error) {
+    const statusCode = error.status || 500
+    console.error(`Error submitting document to Cloud Storage: ${error}`)
+    return res.status(statusCode).json({ error: error.error || 'Internal Server Error' })
+  }
 }
 
 function cleanupStreams(stream, filepath) {
