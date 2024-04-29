@@ -38,18 +38,6 @@ const User = sequelize.define('userbase', {
     field: 'documents_deleted',
     comment: 'The total number of evaluated documents that the user has deleted'
   },
-  documentsRemaining: {
-    type: DataTypes.VIRTUAL,
-    allowNull: true,
-    get() {
-      const evaluated = this.getDataValue('documentsEvaluated') || 0
-      const deleted = this.getDataValue('documentsDeleted') || 0
-
-      return evaluated - deleted
-    },
-    field: 'documents_remaining',
-    comment: 'The number of active documents that the user can still see analysis results for'
-  },
   lastUsed: {
     type: DataTypes.DATE,
     allowNull: true,
