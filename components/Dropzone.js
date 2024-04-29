@@ -1,11 +1,3 @@
-//Process Flow
-/**
- * 1. If user succesfully submits document slides to slide with spinning loading symbol (disable mouse and ability to click)
- * 2. If GCP returns error, moves back to uploading page
- * 3. If succesful, slides to results slide
- * 4. On clear, slides back to submission pagey
- */
-//TODO: Not receiving a response from API
 import { useCallback, forwardRef } from "react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
@@ -131,6 +123,7 @@ const Dropzone = forwardRef((props, ref) => {
       })
 
       if (!res.ok) {
+        setLoading(false)
         const data = await res.json()
         throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
       }
@@ -140,8 +133,6 @@ const Dropzone = forwardRef((props, ref) => {
     } catch (error) {
       console.error(`Error uploading document to google cloud: ${error}`)
       openSnackbar({ message: 'There was an error uploading your document, please try again later', severity: 'error' })
-    } finally {
-      setLoading(false)
     }
   }
 
