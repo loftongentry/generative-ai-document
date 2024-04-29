@@ -1,10 +1,11 @@
+//TODO: Make sure that validate user doesn't execute before email is available
 //TODO: Generate signed url here if results is selected (need prop for generate url to be passed down results component)
-//TODO: Snackbar keep shifting items around. Need to review that
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Different way of updating last login for user since it can be within the same API route
 //TODO: Handling retrieving new analysis data using SSE
+//TODO: Clean up props
 //TODO: Review over how the useCallbacks and useEffects are being handled
-//TODO (MAYBE): Use "getServerSideProps" when fetching data (post authorization) from firestore (https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
+//TODO: Snackbar keep shifting items around. Need to review that
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Box, Button, Fade, IconButton, Toolbar, Tooltip } from "@mui/material";
@@ -110,7 +111,6 @@ export default function Home() {
 
   }, [results])
 
-  //TODO: Gotta make sure this doesn't execute before there's an email
   const validateUser = useCallback(async () => {
     try {
       const res = await fetch(`/api/auth/validate/${email}`, {
