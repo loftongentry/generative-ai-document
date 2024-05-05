@@ -1,4 +1,3 @@
-//TODO: If document that is selected's results are showing, then clear results, otherwise don't clear results
 import { useEffect, useRef, useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline } from '@mui/material';
 import { signIn, signOut } from "next-auth/react";
@@ -14,7 +13,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const DefaultDrawer = (props) => {
-  const { session, drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, listItems, setListItems, fetchFirestoreAnalysis, openSnackbar } = props
+  const { session, drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, setGeneratedUrl, listItems, setListItems, fetchFirestoreAnalysis, openSnackbar } = props
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [listItemAnchorEl, setListItemAnchorEl] = useState(null)
@@ -56,6 +55,15 @@ const DefaultDrawer = (props) => {
     setListItemAnchorEl(null)
   }
 
+  const handleSettingsModalOpen = () => {
+    setSettingsModalOpen(true)
+    handleProfileMenuClose()
+  }
+
+  const handleSettingsModalClose = () => {
+    setSettingsModalOpen(false)
+  }
+
   const handleOpenDeleteModalOpen = () => {
     setDeleteModal(true)
     handleListItemMenuClose()
@@ -78,9 +86,32 @@ const DefaultDrawer = (props) => {
     handleListItemMenuClose()
   }
 
-  const handleSetResults = (item) => {
+  const handleSetResults = async (item) => {
     if (!editing) {
       setResults(item)
+      await generateUrl(item)
+    }
+  }
+
+  const generateUrl = async (item) => {
+    try {
+      const payload = JSON.stringify({
+        doc_name: item?.cloud_storage_id,
+        bucket: item?.bucket
+      })
+
+      const res = await fetch(`/api/storage/${payload}`)
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+      }
+
+      const generatedUrl = await res.json()
+      setGeneratedUrl(generatedUrl)
+    } catch (error) {
+      console.log(`There was an error generating the url to view the analyzed document: ${error}`)
+      openSnackbar({ message: 'There was an error previewing your analyzed document, please try again later', severity: 'error' })
     }
   }
 
@@ -114,15 +145,6 @@ const DefaultDrawer = (props) => {
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleSettingsModalOpen = () => {
-    setSettingsModalOpen(true)
-    handleProfileMenuClose()
-  }
-
-  const handleSettingsModalClose = () => {
-    setSettingsModalOpen(false)
   }
 
   const handleCleanUp = () => {
@@ -350,6 +372,8 @@ const DefaultDrawer = (props) => {
         openDeleteModal={deleteModal}
         onClose={handleDeleteModalClose}
         selectedItem={selectedItem}
+        results={results}
+        setResults={setResults}
         setSelectedItem={setSelectedItem}
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
         openSnackbar={openSnackbar}
