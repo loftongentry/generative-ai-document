@@ -1,12 +1,13 @@
-//TODO: Make sure that the image is not being hidden by the App Bar when viewing
+//TODO: Make sure that the image is not being hidden by the App Bar when viewing in desktop mode
 //TODO: If document is a PDF, then it's displayed in PDF displayer. (PNG/JPG/JPEG need to be smaller)
 //TODO: Displaying the analyzed document at the proper ratio of height to width (only in desktop mode)
 import { forwardRef, useState } from "react"
-import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, IconButton, Paper, Stack, Typography, Toolbar, styled, Tooltip } from "@mui/material"
+import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, IconButton, Paper, Stack, Typography, Toolbar, styled, Tooltip, CircularProgress } from "@mui/material"
 import Image from "next/image"
 import { languageMap } from "@/languageMap"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { Document, Page } from "react-pdf";
 
 const CustomToolbar = ({ toolbarName, copyToClipboard }) => (
   <Item>
@@ -49,7 +50,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }))
 
 const Results = forwardRef((props, ref) => {
-  const { results, openSnackbar, theme, viewportWidth } = props
+  const { results, generatedUrl, penSnackbar, theme, viewportWidth } = props
   const [langExapanded, setLangExpanded] = useState(false)
   const [wordCountExapnded, setWordCountExpanded] = useState(false)
 
@@ -95,14 +96,26 @@ const Results = forwardRef((props, ref) => {
             }}
           >
             <Item>
-              <Image
-                src={results?.doc_image || ''}
-                alt='Analyzed Document'
-                style={{
-                  //maxHeight: '100%',
-                  maxWidth: '100%'
-                }}
-              />
+              <Document
+                file={generatedUrl}
+                loading={
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <CircularProgress />
+                  </Box>
+                }
+                error={'Failed to load PDF preview'}
+              >
+                <Page
+                  pageNumber={1}
+                  height={300}
+                />
+              </Document>
             </Item>
           </Box>
           <Divider />
