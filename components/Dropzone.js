@@ -5,11 +5,8 @@ import { Box, Button, CircularProgress, Fade, IconButton, List, ListItem, ListIt
 import BackupIcon from '@mui/icons-material/Backup';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DeleteForever from "@mui/icons-material/DeleteForever";
-import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
+import { Document, Page } from 'react-pdf';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 const maxSize = 1024 * 1024 * 5
 
 const Dropzone = forwardRef((props, ref) => {
