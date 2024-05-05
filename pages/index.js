@@ -1,6 +1,6 @@
 //TODO: Make sure that validate user doesn't execute before email is available
-//TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
-//TODO: Different way of updating last login for user since it can be within the same API route
+//TODO: Information icon in top right next to "Clear Results" button or some other simple way of explaining how to upload document
+//TODO: Different way of updating last login for user since it can't be within the same API route used for validation
 //TODO: Handling retrieving new analysis data using SSE
 //TODO: Clean up props
 //TODO: Review over how the useCallbacks and useEffects are being handled
@@ -16,9 +16,9 @@ import Dropzone from "@/components/Dropzone";
 import Results from "@/components/Results";
 import CustomSnackbar from "@/components/CustomSnackbar";
 import { useSnackbar } from "@/context/SnackbarContext";
+import { pdfjs } from "react-pdf";
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
-import { pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 const drawerWidth = 240

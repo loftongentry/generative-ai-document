@@ -1,4 +1,4 @@
-//TODO: Make sure that the image is not being hidden by the App Bar when viewing in desktop mode
+//TODO: Make sure that the image is not being hidden by the App Bar when viewing in desktop mode (maybe just adjust the size of the image based on viewport width?)
 //TODO: Make sure that if there is a different document type selected, displayed using Next/Image
 import { forwardRef, useState } from "react"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, IconButton, Paper, Stack, Typography, Toolbar, styled, Tooltip, CircularProgress } from "@mui/material"
