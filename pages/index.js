@@ -17,7 +17,11 @@ import Dropzone from "@/components/Dropzone";
 import Results from "@/components/Results";
 import CustomSnackbar from "@/components/CustomSnackbar";
 import { useSnackbar } from "@/context/SnackbarContext";
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+import { pdfjs } from "react-pdf";
 
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 const drawerWidth = 240
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -79,6 +83,7 @@ export default function Home() {
   const [dropzoneScale, setDropzoneScale] = useState(false)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
+  const [generatedUrl, setGeneratedUrl] = useState('')
   const [listItems, setListItems] = useState([])
 
   //NOTE: Have to use useState instead of theme object because the component was rendering/mounting before the theme object had chance to change based on screen width
@@ -270,6 +275,7 @@ export default function Home() {
         viewportWidth={viewportWidth}
         results={results}
         setResults={setResults}
+        setGeneratedUrl={setGeneratedUrl}
         listItems={listItems}
         setListItems={setListItems}
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
@@ -320,6 +326,7 @@ export default function Home() {
           <div>
             <Results
               results={results}
+              generatedUrl={generatedUrl}
               openSnackbar={openSnackbar}
               theme={theme}
               viewportWidth={viewportWidth}
