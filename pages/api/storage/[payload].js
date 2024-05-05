@@ -1,10 +1,9 @@
-//TODO: Need to test
 import { storage } from "@/lib/storage";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {
   const { query: { payload } } = req
-  const { doc_name, bucket } = payload
+  const { doc_name, bucket } = JSON.parse(payload)
   const token = await getToken({ req })
 
   if (!token) {
@@ -15,9 +14,10 @@ export default async function handler(req, res) {
     const options = {
       version: 'v4',
       action: 'read',
-      expires: Date.now() * 3600 * 1000
+      expires: Date.now() + 3600 * 1000
     }
 
+    //await needs to be here, even though VS code says it does not
     const [signedUrl] = await storage.bucket(bucket).file(doc_name).getSignedUrl(options)
 
     return res.status(200).json(signedUrl)
