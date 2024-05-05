@@ -1,5 +1,4 @@
 //TODO: Make sure that validate user doesn't execute before email is available
-//TODO: Generate signed url here if results is selected (need prop for generate url to be passed down results component)
 //TODO: Information icon in top right next to "Clear Results" button (Open modal explaning how to use the )
 //TODO: Different way of updating last login for user since it can be within the same API route
 //TODO: Handling retrieving new analysis data using SSE
@@ -200,6 +199,11 @@ export default function Home() {
   //   }
   // }, [loading])
 
+  const handleClearResults = () => {
+    setResults(null)
+    setGeneratedUrl('')
+  }
+
   const handleDrawer = () => {
     setDrawerOpen(!drawerOpen)
   }
@@ -258,7 +262,7 @@ export default function Home() {
             >
               <Button
                 variant="contained"
-                onClick={() => setResults(null)}
+                onClick={handleClearResults}
               >
                 Clear Results
               </Button>
@@ -276,6 +280,7 @@ export default function Home() {
         results={results}
         setResults={setResults}
         setGeneratedUrl={setGeneratedUrl}
+        handleClearResults={handleClearResults}
         listItems={listItems}
         setListItems={setListItems}
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}

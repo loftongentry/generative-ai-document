@@ -1,3 +1,4 @@
+//TODO: Some sort of warning while "loading" is occuring/preventing someone from having certain events execute while loading
 import { useEffect, useRef, useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline } from '@mui/material';
 import { signIn, signOut } from "next-auth/react";
@@ -13,7 +14,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const DefaultDrawer = (props) => {
-  const { session, drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, setGeneratedUrl, listItems, setListItems, fetchFirestoreAnalysis, openSnackbar } = props
+  const { session, drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, setGeneratedUrl, handleClearResults, listItems, setListItems, fetchFirestoreAnalysis, openSnackbar } = props
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [listItemAnchorEl, setListItemAnchorEl] = useState(null)
@@ -184,7 +185,7 @@ const DefaultDrawer = (props) => {
             gap: '5px'
           }}
           disabled={!valid || results === null}
-          onClick={() => setResults(null)}
+          onClick={handleClearResults}
         >
           <InsertDriveFileIcon />
           <Typography>
