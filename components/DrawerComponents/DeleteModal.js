@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogActions, Button } from '@mui/material';
 
 const DeleteModal = (props) => {
-  const { openDeleteModal, onClose, selectedItem, setSelectedItem, fetchFirestoreAnalysis, openSnackbar } = props
+  const { openDeleteModal, onClose, selectedItem, results, setResults, setSelectedItem, fetchFirestoreAnalysis, openSnackbar } = props
   const [loading, setLoading] = useState(false)
 
   const handleDelete = async () => {
@@ -20,6 +20,10 @@ const DeleteModal = (props) => {
       if (!res.ok) {
         const data = await res.json()
         throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+      }
+
+      if (selectedItem?.id === results?.id) {
+        setResults(null)
       }
 
       setSelectedItem(null)
@@ -43,7 +47,7 @@ const DeleteModal = (props) => {
         Delete Analysis
       </DialogTitle>
       <DialogContent dividers>
-        This will delete the analysis for <b>{selectedItem?.name}</b>
+        This will delete the analysis for <b>{selectedItem?.file_name}</b>
       </DialogContent>
       <DialogActions>
         <Button
