@@ -1,3 +1,4 @@
+//TODO: BUG: After done editing name, dehighlights component
 //TODO: Some sort of warning while "loading" is occuring/preventing someone from having certain events execute while loading
 import { useEffect, useRef, useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline } from '@mui/material';
