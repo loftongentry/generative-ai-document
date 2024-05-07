@@ -1,11 +1,8 @@
-//TODO: Make sure that validate user doesn't execute before email is available
 //TODO: Information icon in top right next to "Clear Results" button or some other simple way of explaining how to upload document
-//TODO: Different way of updating last login for user since it can't be within the same API route used for validation
 //TODO: Handling retrieving new analysis data using SSE
 //TODO: Clean up props
-//TODO: Review over how the useCallbacks and useEffects are being handled
 //TODO: Snackbar keep shifting items around. Need to review that
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Box, Button, Fade, IconButton, Toolbar, Tooltip } from "@mui/material";
 import { styled, useTheme } from '@mui/material/styles';
@@ -73,8 +70,6 @@ export default function Home() {
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
   const mainRef = useRef(null)
   const theme = useTheme()
-  const valid = session?.user
-  const email = session?.user?.email
   const [file, setFile] = useState(null)
   const [viewportWidth, setViewportWidth] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
@@ -115,40 +110,7 @@ export default function Home() {
 
   }, [results])
 
-  const validateUser = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/auth/validate/${email}`, {
-        method: 'GET',
-      })
-
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
-      }
-
-      const response = await res.json()
-      const uuid = response.uuid
-
-      localStorage.setItem('uuid', uuid)
-    } catch (error) {
-      console.error(`Error occurred when logging in user: ${error}`)
-      openSnackbar({ message: 'Error signing in user', severity: 'error' })
-    }
-  }, [])
-
-  useEffect(() => {
-    if (status === 'authenticated') {
-      const uuid = localStorage.getItem('uuid')
-
-      if (!uuid) {
-        validateUser()
-      } else {
-        return
-      }
-    }
-  }, [status, validateUser])
-
-  const fetchFirestoreAnalysis = useCallback(async () => {
+  const fetchFirestoreAnalysis = async () => {
     try {
       const uuid = localStorage.getItem('uuid')
       const res = await fetch(`/api/fetch-analysis/${uuid}`)
@@ -164,15 +126,39 @@ export default function Home() {
       console.error(`Error retrieving user's items from Firestore: ${error}`)
       openSnackbar({ message: `Unable to retrieve your document analysis, please try again later`, severity: 'error' })
     }
-  }, [])
+  }
+
+  const validateUser = async (email) => {
+    try {
+      const storedUUID = localStorage.getItem('uuid')
+
+      if (!storedUUID) {
+        const res = await fetch(`/api/auth/validate/${email}`)
+
+        if (!res.ok) {
+          const data = await res.json()
+          throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+        }
+
+        const response = await res.json()
+        const uuid = response.uuid
+
+        localStorage.setItem('uuid', uuid)
+      }
+
+      await fetchFirestoreAnalysis()
+    } catch (error) {
+      console.error(`Error occurred when logging in user: ${error}`)
+      openSnackbar({ message: 'Error signing in user', severity: 'error' })
+    }
+  }
 
   useEffect(() => {
-    if (valid) {
-      fetchFirestoreAnalysis()
-    } else {
-      setListItems([])
+    if (status === 'authenticated') {
+      const email = session.user.email
+      validateUser(email)
     }
-  }, [valid, fetchFirestoreAnalysis])
+  }, [session, status])
 
   // useEffect(() => {
   //   const eventSource = new EventSource('/api/getFileData')
