@@ -1,7 +1,4 @@
-//TODO: When in global loading state waiting for retrieving data, don't allow clicking anywhere
 //TODO: Handling retrieving new analysis data using SSE
-//TODO: Clean up props
-//TODO: Snackbar keep shifting items around. Need to review that
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Alert, Box, Button, Fade, IconButton, Snackbar, Toolbar, Tooltip } from "@mui/material";
