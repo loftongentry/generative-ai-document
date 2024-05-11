@@ -13,7 +13,22 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const DefaultDrawer = (props) => {
-  const { session, drawerOpen, handleDrawer, drawerWidth, viewportWidth, results, setResults, setGeneratedUrl, handleClearResults, listItems, setListItems, fetchFirestoreAnalysis, openSnackbar } = props
+  const {
+    session,
+    drawerOpen,
+    handleDrawer,
+    drawerWidth,
+    viewportWidth,
+    results,
+    setResults,
+    setGeneratedUrl,
+    handleClearResults,
+    listItems,
+    setListItems,
+    fetchFirestoreAnalysis,
+    openSnackbar,
+    globalLoading
+  } = props
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [listItemAnchorEl, setListItemAnchorEl] = useState(null)
@@ -151,6 +166,7 @@ const DefaultDrawer = (props) => {
   return (
     <Drawer
       sx={{
+        pointerEvents: globalLoading ? 'none' : 'auto',
         width: drawerWidth,
         flexShrink: 0,
         '& .MuiDrawer-paper': {

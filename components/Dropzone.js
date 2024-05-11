@@ -10,7 +10,7 @@ import { Document, Page } from 'react-pdf';
 const maxSize = 1024 * 1024 * 5
 
 const Dropzone = forwardRef((props, ref) => {
-  const { session, file, setFile, openSnackbar, loading, setLoading } = props
+  const { session, file, setFile, openSnackbar, globalLoading, setGlobalLoading } = props
   const valid = session?.user
 
   const onDrop = useCallback(acceptedFiles => {
@@ -103,7 +103,7 @@ const Dropzone = forwardRef((props, ref) => {
   }
 
   const handleSubmit = async () => {
-    setLoading(true)
+    setGlobalLoading(true)
 
     try {
       if (!valid) {
@@ -120,7 +120,7 @@ const Dropzone = forwardRef((props, ref) => {
       })
 
       if (!res.ok) {
-        setLoading(false)
+        setGlobalLoading(false)
         const data = await res.json()
         throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
       }
@@ -159,11 +159,11 @@ const Dropzone = forwardRef((props, ref) => {
           width: '425px',
           height: '175px',
         }}
-        disabled={!valid || file !== null || loading}
+        disabled={!valid || file !== null || globalLoading}
       >
         <Fade
-          in={!loading}
-          out={`${loading}`}
+          in={!globalLoading}
+          out={`${globalLoading}`}
           unmountOnExit
           timeout={{ enter: 250, exit: 0 }}
         >
@@ -179,8 +179,8 @@ const Dropzone = forwardRef((props, ref) => {
           </Box>
         </Fade>
         <Fade
-          in={loading}
-          out={`${!loading}`}
+          in={globalLoading}
+          out={`${!globalLoading}`}
           unmountOnExit
           timeout={{ enter: 250, exit: 0 }}
         >
@@ -217,7 +217,7 @@ const Dropzone = forwardRef((props, ref) => {
                 sx={{
                   borderRadius: '5px'
                 }}
-                disabled={loading}
+                disabled={globalLoading}
               >
                 <ListItemIcon >
                   <DescriptionIcon sx={{ fontSize: 40 }} />
@@ -230,7 +230,7 @@ const Dropzone = forwardRef((props, ref) => {
             </Tooltip>
             <IconButton
               onClick={() => setFile(null)}
-              disabled={loading}
+              disabled={globalLoading}
             >
               <DeleteForever sx={{ fontSize: 40, color: 'red' }} />
             </IconButton>
@@ -239,8 +239,8 @@ const Dropzone = forwardRef((props, ref) => {
       </Fade>
 
       <Fade
-        in={(file !== null) && !loading}
-        out={`${loading}`}
+        in={(file !== null) && !globalLoading}
+        out={`${globalLoading}`}
       >
         <Button
           variant='contained'

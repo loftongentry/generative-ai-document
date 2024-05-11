@@ -4,7 +4,7 @@
 //TODO: Snackbar keep shifting items around. Need to review that
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Box, Button, Fade, IconButton, Toolbar, Tooltip } from "@mui/material";
+import { Alert, Box, Button, Fade, IconButton, Snackbar, Toolbar, Tooltip } from "@mui/material";
 import { styled, useTheme } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -75,7 +75,7 @@ export default function Home() {
   const [viewportHeight, setViewportHeight] = useState(0)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [dropzoneScale, setDropzoneScale] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [globalLoading, setGlobalLoading] = useState(false)
   const [results, setResults] = useState(null)
   const [generatedUrl, setGeneratedUrl] = useState('')
   const [listItems, setListItems] = useState([])
@@ -236,7 +236,7 @@ export default function Home() {
               >
                 <Button
                   variant="contained"
-                  onClick={() => setLoading(prev => !prev)}
+                  onClick={() => setGlobalLoading(prev => !prev)}
                 >
                   Change Loading State
                 </Button>
@@ -271,6 +271,7 @@ export default function Home() {
         setListItems={setListItems}
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
         openSnackbar={openSnackbar}
+        globalLoading={globalLoading}
       />
 
       <Main
@@ -296,8 +297,8 @@ export default function Home() {
               file={file}
               setFile={setFile}
               openSnackbar={openSnackbar}
-              loading={loading}
-              setLoading={setLoading}
+              globalLoading={globalLoading}
+              setGlobalLoading={setGlobalLoading}
             />
           </div>
         </Fade>
@@ -332,6 +333,18 @@ export default function Home() {
         message={message}
         severity={severity}
       />
+
+      <Snackbar
+        open={globalLoading}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center'
+        }}
+      >
+        <Alert severity='warning'>
+          Your document is being processed, please be patient and do not close the page
+        </Alert>
+      </Snackbar>
     </Box >
   )
 }
