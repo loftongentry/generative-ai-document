@@ -1,5 +1,3 @@
-//TODO: BUG: After done editing name, dehighlights component
-//TODO: Some sort of warning while "loading" is occuring/preventing someone from having certain events execute while loading
 import { useEffect, useRef, useState } from "react";
 import { IconButton, Avatar, Drawer, Popover, Typography, MenuItem, ListItemIcon, ListItemText, Divider, MenuList, Toolbar, ListItem, ListItemButton, List, Box, Input, CssBaseline } from '@mui/material';
 import { signIn, signOut } from "next-auth/react";
@@ -25,7 +23,6 @@ const DefaultDrawer = (props) => {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
-  const [loading, setLoading] = useState(false)
   const valid = session?.user
   const inputRef = useRef(null)
 
@@ -124,8 +121,6 @@ const DefaultDrawer = (props) => {
       return
     }
 
-    setLoading(true)
-
     try {
       const payload = JSON.stringify({
         doc_id: selectedItem.id,
@@ -144,8 +139,6 @@ const DefaultDrawer = (props) => {
     } catch (error) {
       console.error(`There was an error updating document's name in google firestore: ${error}`)
       openSnackbar({ message: `There was an error updating your document's analysis, please try again later`, severity: 'error' })
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -221,23 +214,15 @@ const DefaultDrawer = (props) => {
               sx={{
                 marginBottom: index !== listItems.length - 1 ? '8px' : 0,
               }}
-              secondaryAction={
-                (!editing && (
-                  <IconButton
-                    onClick={(event) => handleListItemMenuOpen(event, item)}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                ))
-              }
             >
               <ListItemButton
                 onClick={() => handleSetResults(item)}
                 selected={results?.id === item?.id}
-                disableRipple={editing}
+                disableRipple={editing || results?.id === item?.id}
                 sx={{
                   borderRadius: '5px',
-                  height: '39px'
+                  height: '39px',
+                  justifyContent: 'space-between'
                 }}
               >
                 {editing && selectedItem === item ? (
@@ -264,6 +249,18 @@ const DefaultDrawer = (props) => {
                   <Typography noWrap>
                     {item.file_name}
                   </Typography>
+                )}
+                {!editing && (results?.id === item?.id) && (
+                  <IconButton
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      handleListItemMenuOpen(event, item)
+                    }}
+                    edge='end'
+                    disableRipple
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
                 )}
               </ListItemButton>
             </ListItem>
@@ -380,7 +377,7 @@ const DefaultDrawer = (props) => {
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
         openSnackbar={openSnackbar}
       />
-    </Drawer>
+    </Drawer >
   )
 }
 
