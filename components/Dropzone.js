@@ -138,7 +138,6 @@ const Dropzone = forwardRef((props, ref) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
       }}
       ref={ref}
