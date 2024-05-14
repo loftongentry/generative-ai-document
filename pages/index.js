@@ -31,7 +31,7 @@ const scrollbarStyle = `
 `;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open, width }) => ({
+  ({ theme, open, width, results }) => ({
     display: 'flex',
     justifyContent: 'center',
     flexGrow: 1,
@@ -39,7 +39,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginTop: width <= 768 ? '0px' : '128px',
+    marginTop: results && width <= 425 ? '-32px' : '64px',
     marginLeft: `-${drawerWidth}px`,
     ...(open && {
       transition: theme.transitions.create('margin', {
@@ -96,14 +96,13 @@ export default function Home() {
 
   useEffect(() => {
     const style = document.createElement("style");
-    style.textContent = scrollbarStyle;
-    document.head.appendChild(style);
+    style.textContent = scrollbarStyle
+    document.head.appendChild(style)
 
-    // Cleanup when component unmounts
     return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
+      document.head.removeChild(style)
+    }
+  }, [])
 
   //NOTE: Have to use useState instead of theme object because the component was rendering/mounting before the theme object had chance to change based on screen width
   useEffect(() => {
@@ -330,6 +329,7 @@ export default function Home() {
         ref={mainRef}
         open={drawerOpen}
         width={viewportWidth}
+        results={results}
       >
         <Fade
           container={mainRef.current}
@@ -343,7 +343,6 @@ export default function Home() {
           }}
         >
           <div>
-            <DrawerHeader />
             <DrawerHeader />
             <Dropzone
               session={session}

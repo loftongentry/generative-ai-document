@@ -1,3 +1,4 @@
+//NOTE: Depending on the image that's being evaluated, on medium and small mobile, item boxes may be too large for viewing port
 import { forwardRef, useState } from "react"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, IconButton, Paper, Stack, Typography, Toolbar, styled, Tooltip, CircularProgress } from "@mui/material"
 import { languageMap } from "@/languageMap"
@@ -57,7 +58,8 @@ const Results = forwardRef((props, ref) => {
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            scale: '0.9'
           }}
         >
           <Document
@@ -131,12 +133,12 @@ const Results = forwardRef((props, ref) => {
       ref={ref}
       spacing={1}
     >
-      {viewportWidth > 425 && (
-        <>
-          {getFileTypePreview()}
-          <Divider />
-        </>
-      )}
+      {getFileTypePreview()}
+      <Divider 
+        sx={{
+          maxWidth: '100%'
+        }}
+      />
       <Grid
         container
         sx={{ flexGrow: 1 }}
