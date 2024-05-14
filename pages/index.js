@@ -1,7 +1,7 @@
 //TODO: Handling retrieving new analysis data using SSE
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { Alert, Box, Button, Fade, IconButton, Snackbar, Toolbar, Tooltip } from "@mui/material";
+import { Alert, Box, Button, CssBaseline, Fade, IconButton, Snackbar, Toolbar, Tooltip } from "@mui/material";
 import { styled, useTheme } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -17,19 +17,29 @@ import 'react-pdf/dist/Page/TextLayer.css';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 const drawerWidth = 240
 
+const scrollbarStyle = `
+  body::-webkit-scrollbar {
+    width: 6px;
+    background-color: transparent;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 6px;
+    border: 3px solid #f0f0f0;
+  }
+`;
+
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open, width, height }) => ({
-    height: `calc(${height}px - 64px)`,
+  ({ theme, open, width }) => ({
     display: 'flex',
-    flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
     flexGrow: 1,
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginTop: `64px`,
+    marginTop: width <= 768 ? '0px' : '128px',
     marginLeft: `-${drawerWidth}px`,
     ...(open && {
       transition: theme.transitions.create('margin', {
@@ -41,7 +51,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     ...(width < 768 && {
       marginLeft: 0,
     }),
-    overflow: 'hidden'
+    overflow: 'hidden',
   }),
 )
 
@@ -62,6 +72,14 @@ const AppBar = styled(MuiAppBar, {
   }),
 }))
 
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-end',
+}))
+
 export default function Home() {
   const { data: session, status } = useSession()
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
@@ -69,7 +87,6 @@ export default function Home() {
   const theme = useTheme()
   const [file, setFile] = useState(null)
   const [viewportWidth, setViewportWidth] = useState(0)
-  const [viewportHeight, setViewportHeight] = useState(0)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [dropzoneScale, setDropzoneScale] = useState(false)
   const [globalLoading, setGlobalLoading] = useState(false)
@@ -77,24 +94,33 @@ export default function Home() {
   const [generatedUrl, setGeneratedUrl] = useState('')
   const [listItems, setListItems] = useState([])
 
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = scrollbarStyle;
+    document.head.appendChild(style);
+
+    // Cleanup when component unmounts
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   //NOTE: Have to use useState instead of theme object because the component was rendering/mounting before the theme object had chance to change based on screen width
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth
-      const height = window.innerHeight
       setViewportWidth(width)
-      setViewportHeight(height)
-
       setDropzoneScale(width <= 425)
 
       theme.resultsScale = width <= 768
       theme.resultGridScale = width <= 425
-      theme.palette = { ...theme.palette }
       if ((width <= 1024 && results) || width <= 425) {
         setDrawerOpen(false)
       } else if (width > 425 && !results) {
         setDrawerOpen(true)
       }
+
+      theme.palette = { ...theme.palette }
     }
 
     handleResize()
@@ -105,6 +131,12 @@ export default function Home() {
       window.removeEventListener('resize', handleResize)
     }
 
+  }, [results])
+
+  useEffect(() => {
+    if (results) {
+      generateUrl(results)
+    }
   }, [results])
 
   const fetchFirestoreAnalysis = async () => {
@@ -157,6 +189,28 @@ export default function Home() {
     }
   }, [session, status])
 
+  const generateUrl = useCallback(async (item) => {
+    try {
+      const payload = JSON.stringify({
+        doc_name: item?.cloud_storage_id,
+        bucket: item?.bucket
+      })
+
+      const res = await fetch(`/api/storage/${payload}`)
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+      }
+
+      const generatedUrl = await res.json()
+      setGeneratedUrl(generatedUrl)
+    } catch (error) {
+      console.log(`There was an error generating the url to view the analyzed document: ${error}`)
+      openSnackbar({ message: 'There was an error previewing your analyzed document, please try again later', severity: 'error' })
+    }
+  })
+
   // useEffect(() => {
   //   const eventSource = new EventSource('/api/getFileData')
 
@@ -197,6 +251,7 @@ export default function Home() {
         display: 'flex',
       }}
     >
+      <CssBaseline />
       <AppBar>
         <Toolbar
           sx={{
@@ -262,20 +317,19 @@ export default function Home() {
         viewportWidth={viewportWidth}
         results={results}
         setResults={setResults}
-        setGeneratedUrl={setGeneratedUrl}
         handleClearResults={handleClearResults}
         listItems={listItems}
         setListItems={setListItems}
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
         openSnackbar={openSnackbar}
         globalLoading={globalLoading}
+        generateUrl={generateUrl}
       />
 
       <Main
         ref={mainRef}
         open={drawerOpen}
         width={viewportWidth}
-        height={viewportHeight}
       >
         <Fade
           container={mainRef.current}
@@ -289,6 +343,8 @@ export default function Home() {
           }}
         >
           <div>
+            <DrawerHeader />
+            <DrawerHeader />
             <Dropzone
               session={session}
               file={file}
