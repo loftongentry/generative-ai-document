@@ -91,7 +91,7 @@ const Results = forwardRef((props, ref) => {
           height={0}
           layout="responsive"
           style={{
-            scale: viewportWidth === 768 ? '0.8' : '0.7',
+            scale: '0.8'
           }}
         />
       )
