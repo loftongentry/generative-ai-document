@@ -21,13 +21,13 @@ const DefaultDrawer = (props) => {
     viewportWidth,
     results,
     setResults,
-    setGeneratedUrl,
     handleClearResults,
     listItems,
     setListItems,
     fetchFirestoreAnalysis,
     openSnackbar,
-    globalLoading
+    globalLoading,
+    generateUrl
   } = props
   const [profileAnchorEl, profileProfileAnchorEl] = useState(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
@@ -104,28 +104,6 @@ const DefaultDrawer = (props) => {
     if (!editing) {
       setResults(item)
       await generateUrl(item)
-    }
-  }
-
-  const generateUrl = async (item) => {
-    try {
-      const payload = JSON.stringify({
-        doc_name: item?.cloud_storage_id,
-        bucket: item?.bucket
-      })
-
-      const res = await fetch(`/api/storage/${payload}`)
-
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
-      }
-
-      const generatedUrl = await res.json()
-      setGeneratedUrl(generatedUrl)
-    } catch (error) {
-      console.log(`There was an error generating the url to view the analyzed document: ${error}`)
-      openSnackbar({ message: 'There was an error previewing your analyzed document, please try again later', severity: 'error' })
     }
   }
 
