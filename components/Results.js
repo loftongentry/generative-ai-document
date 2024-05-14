@@ -1,12 +1,10 @@
-//TODO: Make sure that the image is not being hidden by the App Bar when viewing in desktop mode (maybe just adjust the size of the image based on viewport width?)
-//TODO: Make sure that if there is a different document type selected, displayed using Next/Image
 import { forwardRef, useState } from "react"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Grid, IconButton, Paper, Stack, Typography, Toolbar, styled, Tooltip, CircularProgress } from "@mui/material"
-import Image from "next/image"
 import { languageMap } from "@/languageMap"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Document, Page } from "react-pdf";
+import Image from "next/image";
 
 const CustomToolbar = ({ toolbarName, copyToClipboard }) => (
   <Item>
@@ -44,7 +42,7 @@ const Item = styled(Paper)(({ theme }) => ({
   margin: '5px',
   padding: '10px',
   maxHeight: '500px',
-  maxWidth: theme.resultGridScale ? '' : '340px',
+  maxWidth: '380px',
   overflow: 'hidden'
 }))
 
@@ -52,6 +50,53 @@ const Results = forwardRef((props, ref) => {
   const { results, generatedUrl, openSnackbar, theme, viewportWidth } = props
   const [langExapanded, setLangExpanded] = useState(false)
   const [wordCountExapnded, setWordCountExpanded] = useState(false)
+
+  const getFileTypePreview = () => {
+    if (results?.file_type === 'application/pdf') {
+      return (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center'
+          }}
+        >
+          <Document
+            file={generatedUrl}
+            loading={
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <CircularProgress />
+              </Box>
+            }
+            error={'Failed to load PDF preview'}
+          >
+            <Page
+              pageNumber={1}
+              height={450}
+            />
+          </Document>
+        </Box>
+      )
+    } else if (results?.file_type === 'image/png' || results?.file_type === 'image/jpeg') {
+      return (
+        <Image
+          src={generatedUrl}
+          alt='Evaluated Document Image'
+          width={0}
+          height={0}
+          layout="responsive"
+          style={{
+            scale: viewportWidth === 768 ? '0.8' : '0.7',
+          }}
+        />
+      )
+    }
+  }
 
   const getLangName = (langCode) => {
     if (languageMap.hasOwnProperty(langCode)) {
@@ -83,38 +128,12 @@ const Results = forwardRef((props, ref) => {
 
   return (
     <Stack
-      spacing={1}
       ref={ref}
+      spacing={1}
     >
       {viewportWidth > 425 && (
         <>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center'
-            }}
-          >
-            <Document
-              file={generatedUrl}
-              loading={
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                >
-                  <CircularProgress />
-                </Box>
-              }
-              error={'Failed to load PDF preview'}
-            >
-              <Page
-                pageNumber={1}
-                height={450}
-              />
-            </Document>
-          </Box>
+          {getFileTypePreview()}
           <Divider />
         </>
       )}
