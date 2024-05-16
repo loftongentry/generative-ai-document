@@ -353,6 +353,7 @@ const DefaultDrawer = (props) => {
         </Popover>
       </Box>
       <SettingsModal
+        session={session}
         settingsModalOpen={settingsModalOpen}
         handleSettingsModalClose={handleSettingsModalClose}
         viewportWidth={viewportWidth}
