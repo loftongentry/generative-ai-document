@@ -7,7 +7,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 
 const SettingsModal = (props) => {
-  const { settingsModalOpen, handleSettingsModalClose, viewportWidth, fetchFirestoreAnalysis, openSnackbar, signOut, setListItems } = props
+  const { session, settingsModalOpen, handleSettingsModalClose, viewportWidth, fetchFirestoreAnalysis, openSnackbar, signOut, setListItems } = props
   const [selectedSetting, setSelectedSetting] = useState(0)
   const [subject, setSubject] = useState('')
   const [feedback, setFeedback] = useState('')
@@ -25,10 +25,34 @@ const SettingsModal = (props) => {
   const handleSubmit = async () => {
     setLoading(true)
 
+    if (subject === '' || feedback === '') {
+      setLoading(false)
+      openSnackbar({ message: 'Please fill out all form fields', severity: 'error' })
+      return
+    }
+
+    const payload = JSON.stringify({
+      userEmail: session?.user.email,
+      userName: session?.user.name,
+      subject,
+      body: feedback,
+      uuid
+    })
+
     try {
+      const res = await fetch(`/api/email/${payload}`)
 
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+      }
+
+      setSubject('')
+      setFeedback('')
+      openSnackbar({ message: 'Feedback successfully submitted', severity: 'success' })
     } catch (error) {
-
+      console.error(`There was an error submitting feedback: ${error}`)
+      openSnackbar({ message: 'There was an error submitting your feedback, please try again later', severity: 'error' })
     } finally {
       setLoading(false)
     }
@@ -48,6 +72,7 @@ const SettingsModal = (props) => {
       setConfirmModal(false)
       handleSettingsModalClose()
       fetchFirestoreAnalysis()
+      openSnackbar({ message: 'All analysis successfully deleted', severity: 'success' })
     } catch (error) {
       console.error(`There was an error deleting the documents for account: ${uuid}: ${error}`)
       openSnackbar({ message: 'There was an error deleting all of your analysis, please try again later', severity: 'error' })
