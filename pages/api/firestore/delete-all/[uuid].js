@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   const token = await getToken({ req })
 
   if (!token) {
-    return res.status(401).json({ error: 'User access denier' })
+    return res.status(401).json({ error: 'User access denied' })
   }
 
   try {
