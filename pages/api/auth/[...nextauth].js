@@ -19,7 +19,7 @@ const authOptions = {
         params: {
           access_type: 'offline',
           prompt: 'consent',
-          scope: 'openid email profile'
+          scope: 'openid email profile https://www.googleapis.com/auth/gmail.send'
         }
       }
     })
