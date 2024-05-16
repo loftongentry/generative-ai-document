@@ -1,4 +1,3 @@
-//TODO: Add comments explaining what's happening
 import { getToken } from 'next-auth/jwt';
 import formidable from 'formidable';
 import { createReadStream, unlink } from 'fs';
