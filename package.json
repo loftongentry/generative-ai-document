@@ -22,6 +22,7 @@
     "firebase-admin": "^11.11.1",
     "formidable": "^3.5.1",
     "googleapis": "^133.0.0",
+    "mjml": "^4.15.3",
     "next": "14.1.0",
     "next-auth": "^4.24.5",
     "pdfjs-dist": "^3.4.120",
