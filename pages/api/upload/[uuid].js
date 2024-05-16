@@ -3,7 +3,7 @@ import { getToken } from 'next-auth/jwt';
 import formidable from 'formidable';
 import { createReadStream, unlink } from 'fs';
 import { storage } from '@/lib/storage';
-import { getDate } from '@/lib/getDate';
+import { getDate } from '@/lib/get-date';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { User } from '@/database/models';
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   const token = await getToken({ req })
 
   if (!token) {
-    return res.status(401).json({ error: 'User must be logged in to perform this action' })
+    return res.status(401).json({ error: 'User access denied' })
   }
 
   const form = formidable({

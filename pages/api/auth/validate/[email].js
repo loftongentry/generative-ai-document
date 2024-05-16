@@ -1,5 +1,5 @@
 import { User } from "@/database/models";
-import { getDate } from "@/lib/getDate";
+import { getDate } from "@/lib/get-date";
 
 export default async function handler(req, res) {
   const { method, query: { email: email } } = req
