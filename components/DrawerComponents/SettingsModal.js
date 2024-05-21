@@ -91,6 +91,7 @@ const SettingsModal = (props) => {
         throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
       }
 
+      localStorage.removeItem('uuid')
       signOut()
     } catch (error) {
       console.error(`There was an error deleting the account: ${uuid}: ${error}`)
