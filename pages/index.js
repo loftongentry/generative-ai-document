@@ -1,4 +1,3 @@
-//TODO: Handling retrieving new analysis data using SSE
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Alert, Box, Button, CssBaseline, Fade, IconButton, Snackbar, Toolbar, Tooltip } from "@mui/material";
@@ -138,6 +137,28 @@ export default function Home() {
     }
   }, [results])
 
+  const generateUrl = useCallback(async (item) => {
+    try {
+      const payload = JSON.stringify({
+        doc_name: item?.cloud_storage_id,
+        bucket: item?.bucket
+      })
+
+      const res = await fetch(`/api/storage/${payload}`)
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+      }
+
+      const generatedUrl = await res.json()
+      setGeneratedUrl(generatedUrl)
+    } catch (error) {
+      console.log(`There was an error generating the url to view the analyzed document: ${error}`)
+      openSnackbar({ message: 'There was an error previewing your analyzed document, please try again later', severity: 'error' })
+    }
+  })
+
   const fetchFirestoreAnalysis = async () => {
     try {
       const uuid = localStorage.getItem('uuid')
@@ -188,52 +209,46 @@ export default function Home() {
     }
   }, [session, status])
 
-  const generateUrl = useCallback(async (item) => {
-    try {
-      const payload = JSON.stringify({
-        doc_name: item?.cloud_storage_id,
-        bucket: item?.bucket
-      })
-
-      const res = await fetch(`/api/storage/${payload}`)
-
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
-      }
-
-      const generatedUrl = await res.json()
-      setGeneratedUrl(generatedUrl)
-    } catch (error) {
-      console.log(`There was an error generating the url to view the analyzed document: ${error}`)
-      openSnackbar({ message: 'There was an error previewing your analyzed document, please try again later', severity: 'error' })
+  useEffect(() => {
+    if (!globalLoading) {
+      return
     }
-  })
 
-  // useEffect(() => {
-  //   const eventSource = new EventSource('/api/getFileData')
+    const pollData = async () => {
+      try {
+        const res = await fetch('/api/get-file-data', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
 
-  //   if (!loading) {
-  //     eventSource.close()
-  //     return
-  //   }
+        if (!res.ok) {
+          const data = await res.json()
+          throw new Error(`${res.status} - ${res.statusText} - ${data.error}`)
+        }
 
-  //   eventSource.onmessage('message', (event) => {
-  //     const newData = JSON.parse(event.data)
-  //     console.log(newData)
-  //   })
+        const result = await res.json()
 
-  //   eventSource.onerror = (event) => {
-  //     console.log(`Error retrieving results: ${error}`)
-  //     openSnackbar({ message: 'There was an error retrieving your results, please try again later', severity: 'error' })
-  //     eventSource.close()
-  //   }
+        if (result.status === 'ready') {
+          setResults(result.data)
+          clearInterval(interval)
+          setGlobalLoading(false)
+          fetchFirestoreAnalysis()
+        }
+      } catch (error) {
+        console.error(`Error retrieving processed data from server: ${error}`)
+        openSnackbar({ message: 'There was an error getting your processed data, please try again later', severity: 'error' })
+        setGlobalLoading(false)
+      }
+    }
 
-  //   return () => {
-  //     setSubmissionSuccess(false)
-  //     eventSource.close()
-  //   }
-  // }, [loading])
+    const interval = setInterval(pollData, 2000)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [globalLoading])
 
   const handleClearResults = () => {
     setResults(null)
