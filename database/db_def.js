@@ -66,7 +66,7 @@ process.on('uncaughtException', async (error) => {
   process.exit(1)
 })
 
-module.exports = { sequelize, closeSequelize }
+module.exports = { sequelize }
 
 // Leaving this here as a reminder on how to test the connection
 // NOTE: Have to cd in the database folder then run 'node db_def.js' to test properly
