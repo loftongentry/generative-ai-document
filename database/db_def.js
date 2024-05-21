@@ -1,4 +1,3 @@
-//TODO: Preventing recreation of connections after dev server restarts
 const { Sequelize } = require('sequelize')
 require('dotenv').config({ path: '../.env' })
 
