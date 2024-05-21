@@ -55,16 +55,20 @@ const gracefulShutdown = async (signal) => {
   process.exit(0)
 }
 
-process.on('exit', () => gracefulShutdown('exit'))
-process.on('SIGINT', () => gracefulShutdown('SIGINT'))
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
+if (!process.env.LISTENERS_ADDED) {
+  process.on('exit', () => gracefulShutdown('exit'))
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'))
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
 
-process.on('uncaughtException', async (error) => {
-  console.error(`Uncaught error: ${error}`)
-  console.log('Closeing Sequelize connection...')
-  await closeSequelize()
-  process.exit(1)
-})
+  process.on('uncaughtException', async (error) => {
+    console.error(`Uncaught error: ${error}`)
+    console.log('Closing Sequelize connection...')
+    await closeSequelize()
+    process.exit(1)
+  })
+
+  process.env.LISTENERS_ADDED = true
+}
 
 module.exports = { sequelize }
 
