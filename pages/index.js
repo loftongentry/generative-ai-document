@@ -79,6 +79,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }))
 
+const MAX_POLLING_TIME = 2 * 60 * 1000
+
 export default function Home() {
   const { data: session, status } = useSession()
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
@@ -209,6 +211,7 @@ export default function Home() {
     }
   }, [session, status])
 
+  //NOTE: Couldn't figure out SSE or websockets so used polling instead. Can't exceed two minutes for polling for data though
   useEffect(() => {
     if (!globalLoading) {
       return
@@ -216,6 +219,8 @@ export default function Home() {
 
     const pollData = async () => {
       try {
+        const startTime = Date.now()
+
         const res = await fetch('/api/get-file-data', {
           method: 'GET',
           headers: {
@@ -232,9 +237,14 @@ export default function Home() {
 
         if (result.status === 'ready') {
           setResults(result.data)
-          clearInterval(interval)
+          clearInterval(intervalRef.current)
           setGlobalLoading(false)
           fetchFirestoreAnalysis()
+        } else {
+          const elapsedTime = Date.now() - startTime
+          if (elapsedTime > MAX_POLLING_TIME) {
+            throw new Error('Polling time exceeded 2 minutes')
+          }
         }
       } catch (error) {
         console.error(`Error retrieving processed data from server: ${error}`)
@@ -243,10 +253,20 @@ export default function Home() {
       }
     }
 
-    const interval = setInterval(pollData, 2000)
+    const intervalRef = useRef(null)
+
+    intervalRef.current = setInterval(pollData, 2000)
+
+    const timeoutRef = setTimeout(() => {
+      clearInterval(intervalRef.current)
+      console.log('Polling stopped due to timeout.')
+      openSnackbar({ message: 'Polling stopped due to timeout.', severity: 'error' })
+      setGlobalLoading(false)
+    }, MAX_POLLING_TIME)
 
     return () => {
-      clearInterval(interval)
+      clearInterval(intervalRef.current)
+      clearTimeout(timeoutRef)
     }
   }, [globalLoading])
 
