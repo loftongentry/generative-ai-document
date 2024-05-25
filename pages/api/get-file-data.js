@@ -1,4 +1,3 @@
-//TODO: Need to test to make sure it works with sending errors
 let workflowData = null
 
 export default async function handler(req, res) {
@@ -26,7 +25,7 @@ export default async function handler(req, res) {
         if (workflowData.code !== 200) {
           throw new Error('Error retrieving data from the google cloud workflow')
         }
-        
+
         const data = workflowData.body.data
         workflowData = null
         return res.status(200).json({ status: 'ready', data: data })
