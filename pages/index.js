@@ -85,6 +85,7 @@ export default function Home() {
   const { data: session, status } = useSession()
   const { open, message, severity, openSnackbar, closeSnackbar } = useSnackbar()
   const mainRef = useRef(null)
+  const intervalRef = useRef(null)
   const theme = useTheme()
   const [file, setFile] = useState(null)
   const [viewportWidth, setViewportWidth] = useState(0)
@@ -253,11 +254,9 @@ export default function Home() {
       }
     }
 
-    const intervalRef = useRef(null)
-
     intervalRef.current = setInterval(pollData, 2000)
 
-    const timeoutRef = setTimeout(() => {
+    const timeout = setTimeout(() => {
       clearInterval(intervalRef.current)
       console.log('Polling stopped due to timeout.')
       openSnackbar({ message: 'Polling stopped due to timeout.', severity: 'error' })
@@ -266,7 +265,7 @@ export default function Home() {
 
     return () => {
       clearInterval(intervalRef.current)
-      clearTimeout(timeoutRef)
+      clearTimeout(timeout)
     }
   }, [globalLoading])
 
