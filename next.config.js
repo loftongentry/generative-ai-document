@@ -1,8 +1,13 @@
-//TODO: Need to add to the proper bucket for production in here
 /** @type {import('next').NextConfig} */
-const pathname = process.env.NODE_ENV === 'development' ? '/gen-ai-doc-bucket-1-testing/**' : undefined
+const pathname = process.env.NODE_ENV === 'development' ? '/gen-ai-doc-bucket-1-testing/**' : '/gen-ai-doc-bucket-1-production/**'
 
 const nextConfig = {
+  output: 'standalone',
+  webpack: (config) => {
+    config.resolve.alias.canvas = false
+
+    return config
+  },
   reactStrictMode: true,
   images: {
     remotePatterns: [
