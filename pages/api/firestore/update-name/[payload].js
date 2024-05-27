@@ -1,7 +1,7 @@
 import { firestore } from "@/lib/firestore"
 import { getToken } from "next-auth/jwt"
 
-const collection = process.env.NODE_ENV === 'development' ? 'Testing Storage' : ''
+const collection = process.env.NODE_ENV === 'development' ? 'Testing Storage' : 'Production Storage'
 
 export default async function handler(req, res) {
   const { query: { payload } } = req
