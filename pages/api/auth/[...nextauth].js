@@ -81,6 +81,7 @@ const authOptions = {
   },
   theme: {
     colorScheme: 'light',
+    logo: ''
   }
 }
 

@@ -9,6 +9,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
     <SnackbarProvider>
       <SessionProvider session={session}>
         <ThemeModeProvider>
+          <link rel="icon" href="/favicon.ico" sizes="any" />
           <Component {...pageProps} />
         </ThemeModeProvider>
       </SessionProvider>
