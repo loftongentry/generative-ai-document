@@ -11,6 +11,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SecurityIcon from '@mui/icons-material/Security';
+import PrivacyPolicyModal from "./DrawerComponents/PrivacyPolicyModal";
 
 const DefaultDrawer = (props) => {
   const {
@@ -36,6 +38,7 @@ const DefaultDrawer = (props) => {
   const [editing, setEditing] = useState(false)
   const [editedName, setEditedName] = useState('')
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
+  const [privacyPolicyModal, setPrivacyPolicyModal] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
   const valid = session?.user
@@ -76,6 +79,15 @@ const DefaultDrawer = (props) => {
 
   const handleSettingsModalClose = () => {
     setSettingsModalOpen(false)
+  }
+
+  const handlePrivacyPolicyModalOpen = () => {
+    setPrivacyPolicyModal(true)
+    handleProfileMenuClose()
+  }
+
+  const handlePrivacyPolicyModalClose = () => {
+    setPrivacyPolicyModal(false)
   }
 
   const handleOpenDeleteModalOpen = () => {
@@ -332,6 +344,12 @@ const DefaultDrawer = (props) => {
                 </ListItemIcon>
                 <ListItemText>Settings</ListItemText>
               </MenuItem>
+              <MenuItem onClick={handlePrivacyPolicyModalOpen}>
+                <ListItemIcon>
+                  <SecurityIcon />
+                </ListItemIcon>
+                <ListItemText>Privacy Policy</ListItemText>
+              </MenuItem>
               <Divider />
               <MenuItem onClick={handleSignOut} >
                 <ListItemIcon>
@@ -342,6 +360,13 @@ const DefaultDrawer = (props) => {
             </MenuList>
           ) : (
             <MenuList>
+              <MenuItem onClick={handlePrivacyPolicyModalOpen}>
+                <ListItemIcon>
+                  <SecurityIcon />
+                </ListItemIcon>
+                <ListItemText>Privacy Policy</ListItemText>
+              </MenuItem>
+              <Divider />
               <MenuItem onClick={() => signIn()}>
                 <ListItemIcon>
                   <LoginIcon />
@@ -371,6 +396,10 @@ const DefaultDrawer = (props) => {
         setSelectedItem={setSelectedItem}
         fetchFirestoreAnalysis={fetchFirestoreAnalysis}
         openSnackbar={openSnackbar}
+      />
+      <PrivacyPolicyModal
+        privacyPolicyModal={privacyPolicyModal}
+        handlePrivacyPolicyModalClose={handlePrivacyPolicyModalClose}
       />
     </Drawer >
   )

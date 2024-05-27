@@ -141,6 +141,7 @@ const SettingsModal = (props) => {
           alignItems: viewportWidth <= 768 ? 'center' : ''
         }}
       >
+        {/* NOTE: Unused because I didn't want to go through the process of verifying my app to use restricted scopes  */}
         {/* <Tabs
           orientation={viewportWidth > 768 ? "vertical" : 'horizontal'}
           value={selectedSetting}
