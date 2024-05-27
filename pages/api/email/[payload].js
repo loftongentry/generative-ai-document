@@ -1,3 +1,4 @@
+//NOTE: Unused because I didn't want to go through the process of verifying my app to use restricted scopes
 import generateTemplate from "@/lib/generate-template";
 import { google } from "googleapis";
 import { getToken } from "next-auth/jwt";

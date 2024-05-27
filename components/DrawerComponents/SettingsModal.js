@@ -21,6 +21,7 @@ const SettingsModal = (props) => {
     setModalType(action)
   }
 
+  //NOTE: Unused because I didn't want to go through the process of verifying my app to use restricted scopes
   const handleSubmit = async () => {
     setLoading(true)
 
@@ -115,9 +116,18 @@ const SettingsModal = (props) => {
             alignItems: 'center'
           }}
         >
-          <Typography variant="h5">
-            Settings
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px'
+            }}
+          >
+            <SettingsIcon />
+            <Typography variant="h5">
+              Settings
+            </Typography>
+          </Box>
           <IconButton onClick={handleSettingsModalClose}>
             <CloseIcon />
           </IconButton>
@@ -131,7 +141,7 @@ const SettingsModal = (props) => {
           alignItems: viewportWidth <= 768 ? 'center' : ''
         }}
       >
-        <Tabs
+        {/* <Tabs
           orientation={viewportWidth > 768 ? "vertical" : 'horizontal'}
           value={selectedSetting}
           onChange={(event, newValue) => setSelectedSetting(newValue)}
@@ -164,7 +174,7 @@ const SettingsModal = (props) => {
               <FeedbackIcon />
             </Typography>
           } {...a11yProps(1)} />
-        </Tabs>
+        </Tabs> */}
         <TabPanel value={selectedSetting} index={0} viewportWidth={viewportWidth}>
           <Stack
             spacing={1}
