@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         const data = workflowData.body.data
         workflowData = null
 
-        if (data.includes('error')) {
+        if (data && typeof data === 'string' && data.includes('error')) {
           throw new Error(data)
         }
 
