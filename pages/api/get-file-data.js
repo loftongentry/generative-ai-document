@@ -7,7 +7,6 @@ export default async function handler(req, res) {
     try {
       workflowData = req
 
-      console.log(workflowData)
       return res.status(200).json({ success: true })
     } catch (error) {
       console.error(`Error trying to receive data from workflow: ${error}`)
@@ -22,9 +21,6 @@ export default async function handler(req, res) {
         return res.status(200).json({ status: 'pending' })
       } else {
         console.log('retrieved data')
-        if (workflowData.code !== 200) {
-          throw new Error('Error retrieving data from the google cloud workflow')
-        }
 
         const data = workflowData.body.data
         workflowData = null
